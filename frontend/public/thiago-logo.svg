@@ -1,0 +1,9 @@
+<svg width="360" height="96" viewBox="0 0 360 96" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <circle cx="48" cy="48" r="28" fill="#FFE45C"/>
+  <circle cx="48" cy="48" r="18" fill="#F5A623"/>
+  <path d="M48 25a23 23 0 0 1 22 16h11L66 58 51 41h9A13 13 0 0 0 36 35l-7-7a23 23 0 0 1 19-3Z" fill="#FF8A00"/>
+  <path d="M48 71a23 23 0 0 1-22-16H15l15-17 15 17h-9a13 13 0 0 0 24 6l7 7a23 23 0 0 1-19 3Z" fill="#FFB300"/>
+  <text x="42" y="57" font-family="Arial, sans-serif" font-weight="900" font-size="26" fill="#7D151A">₿</text>
+  <text x="95" y="43" font-family="Arial, sans-serif" font-weight="900" font-size="30" fill="#8F171D">Thiago</text>
+  <text x="95" y="73" font-family="Arial, sans-serif" font-weight="900" font-size="30" fill="#8F171D">Exchange</text>
+</svg>

@@ -1,0 +1,43 @@
+services:
+  - type: web
+    name: thiagoxchange-api
+    runtime: go
+    rootDir: backend
+    plan: free
+    buildCommand: go build -tags netgo -ldflags '-s -w' -o app ./cmd/server
+    startCommand: ./app
+    healthCheckPath: /health
+    envVars:
+      - key: APP_NAME
+        value: Thiago Exchange
+      - key: MONGODB_URI
+        sync: false
+      - key: MONGODB_DATABASE
+        value: thiago_exchange
+      - key: JWT_SECRET
+        generateValue: true
+      - key: ADMIN_EMAILS
+        sync: false
+      - key: SMTP_HOST
+        value: smtp.gmail.com
+      - key: SMTP_PORT
+        value: "587"
+      - key: SMTP_USER
+        sync: false
+      - key: SMTP_PASS
+        sync: false
+      - key: SMTP_FROM_NAME
+        value: Thiago Exchange
+      - key: FRONTEND_URL
+        value: https://thiagoxchange-web.onrender.com
+
+  - type: web
+    name: thiagoxchange-web
+    runtime: node
+    rootDir: frontend
+    plan: free
+    buildCommand: npm ci && npm run build
+    startCommand: npm run start
+    envVars:
+      - key: NEXT_PUBLIC_API_URL
+        value: https://thiagoxchange-api.onrender.com/api
