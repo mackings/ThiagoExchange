@@ -51,3 +51,14 @@ func (r *Repository) SetRole(ctx context.Context, id primitive.ObjectID, role st
 	_, err := r.collection.UpdateByID(ctx, id, bson.M{"$set": bson.M{"role": role}})
 	return err
 }
+
+func (r *Repository) UpdateProfile(ctx context.Context, id primitive.ObjectID, name, phone string) (User, error) {
+	_, err := r.collection.UpdateByID(ctx, id, bson.M{"$set": bson.M{
+		"name":  strings.TrimSpace(name),
+		"phone": strings.TrimSpace(phone),
+	}})
+	if err != nil {
+		return User{}, err
+	}
+	return r.FindByID(ctx, id)
+}

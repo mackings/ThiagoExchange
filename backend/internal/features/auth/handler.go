@@ -60,3 +60,23 @@ func (h Handler) Login(w http.ResponseWriter, r *http.Request) {
 func (h Handler) Me(w http.ResponseWriter, r *http.Request) {
 	httpx.JSON(w, http.StatusOK, map[string]interface{}{"user": CurrentUser(r)})
 }
+
+func (h Handler) UpdateMe(w http.ResponseWriter, r *http.Request) {
+	var input struct {
+		Name  string `json:"name"`
+		Phone string `json:"phone"`
+	}
+	if !httpx.Decode(w, r, &input) {
+		return
+	}
+	user, err := h.service.UpdateProfile(r.Context(), CurrentUser(r), input.Name, input.Phone)
+	if err != nil {
+		if errors.Is(err, ErrInvalidRegistration) {
+			httpx.Error(w, http.StatusBadRequest, "name is required")
+			return
+		}
+		httpx.Error(w, http.StatusInternalServerError, "could not update profile")
+		return
+	}
+	httpx.JSON(w, http.StatusOK, map[string]interface{}{"user": user})
+}

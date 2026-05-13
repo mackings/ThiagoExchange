@@ -69,6 +69,14 @@ func (s *Service) Login(ctx context.Context, email, password string) (User, stri
 	return user, token, err
 }
 
+func (s *Service) UpdateProfile(ctx context.Context, user User, name, phone string) (User, error) {
+	name = strings.TrimSpace(name)
+	if name == "" {
+		return User{}, ErrInvalidRegistration
+	}
+	return s.repo.UpdateProfile(ctx, user.ID, name, phone)
+}
+
 func (s *Service) issueToken(user User) (string, error) {
 	return jwt.NewWithClaims(jwt.SigningMethodHS256, Claims{
 		UserID: user.ID.Hex(),

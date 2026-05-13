@@ -22,16 +22,16 @@ import {
   Tooltip,
   Typography
 } from "@mui/material";
+import AccountCircleIcon from "@mui/icons-material/AccountCircle";
+import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import HistoryIcon from "@mui/icons-material/History";
 import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
-import PaidIcon from "@mui/icons-material/Paid";
 import SecurityIcon from "@mui/icons-material/Security";
 import TimerIcon from "@mui/icons-material/Timer";
-import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import WalletIcon from "@mui/icons-material/Wallet";
 import { AuthDialog, AuthMode, Session } from "@/features/auth/AuthDialog";
-import { RateNotifier } from "@/features/notifications/RateNotifier";
+import { ProfileView } from "@/features/profile/ProfileView";
 import { HistoryView } from "@/features/trades/HistoryView";
 import { TradeChat } from "@/features/trades/TradeChat";
 import { TradeView } from "@/features/trades/TradeView";
@@ -41,6 +41,7 @@ import { TradeTimer } from "@/shared/ui/TradeTimer";
 
 const sessionKey = "thiago.session";
 const keepAliveIntervalMs = 14 * 60 * 1000;
+type TradeScreen = "offers" | "trade";
 
 export default function Home() {
   return <ExchangeApp />;
@@ -55,14 +56,16 @@ function ExchangeApp() {
   const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
+  const [selectedRate, setSelectedRate] = useState<Rate | null>(null);
+  const [tradeScreen, setTradeScreen] = useState<TradeScreen>("offers");
+  const [activeTradeSeen, setActiveTradeSeen] = useState("");
 
   const token = session?.token;
   const user = session?.user;
   const safeRates = Array.isArray(rates) ? rates : [];
   const safeTrades = Array.isArray(trades) ? trades : [];
-  const activeTrade = useMemo(() => safeTrades.find((trade) => trade.status === "pending") || null, [safeTrades]);
+  const activeTrade = useMemo(() => safeTrades.find((trade) => trade.status === "pending" || trade.status === "confirmed") || null, [safeTrades]);
 
-  
   useEffect(() => {
     const saved = localStorage.getItem(sessionKey);
     if (saved) {
@@ -76,6 +79,12 @@ function ExchangeApp() {
   useEffect(() => {
     if (token) loadTrades(token);
   }, [token]);
+
+  useEffect(() => {
+    if (!activeTrade || activeTrade.id === activeTradeSeen) return;
+    setActiveTradeSeen(activeTrade.id);
+    playActiveTradeSound();
+  }, [activeTrade, activeTradeSeen]);
 
   useEffect(() => {
     async function keepAlive() {
@@ -119,12 +128,22 @@ function ExchangeApp() {
     setAuthOpen(false);
   }
 
+  function updateUser(nextUser: Session["user"]) {
+    if (!session) return;
+    const next = { ...session, user: nextUser };
+    localStorage.setItem(sessionKey, JSON.stringify(next));
+    setSession(next);
+  }
+
   function logout() {
     localStorage.removeItem(sessionKey);
     setSession(null);
     setTrades([]);
     setAuthMode("login");
     setAuthOpen(true);
+    setActiveTab(0);
+    setTradeScreen("offers");
+    setSelectedRate(null);
   }
 
   return (
@@ -147,10 +166,13 @@ function ExchangeApp() {
           <Image src="/thiago-logo.svg" alt="Thiago Exchange" width={150} height={40} priority />
           <Box sx={{ flexGrow: 1 }} />
           <Stack direction="row" spacing={0.5} sx={{ display: { xs: "none", md: "flex" }, p: 0.5, borderRadius: 999, bgcolor: "#f3f4ff" }}>
-            {["Trade", "History"].map((item, index) => (
+            {["Offers", "History", "Profile"].map((item, index) => (
               <Button
                 key={item}
-                onClick={() => setActiveTab(index)}
+                onClick={() => {
+                  setActiveTab(index);
+                  if (index !== 0) setSelectedRate(null);
+                }}
                 sx={{
                   px: 2.3,
                   color: activeTab === index ? "#08133b" : "#60708c",
@@ -200,7 +222,7 @@ function ExchangeApp() {
                     fontSize: { xs: 29, sm: 46, md: 78 },
                     lineHeight: { xs: 1, md: 0.94 },
                     letterSpacing: { xs: "-0.035em", md: "-0.055em" },
-                    background: "linear-gradient(115deg, #2764ff 0%, #6657f6 45%, #d84bbf 92%)",
+                    background: "linear-gradient(115deg, #0f7a62 0%, #5757f6 48%, #d84bbf 92%)",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent"
                   }}
@@ -210,11 +232,7 @@ function ExchangeApp() {
                 <Typography sx={{ color: "#53627c", maxWidth: 690, fontSize: { xs: 13.5, md: 18 }, lineHeight: { xs: 1.5, md: 1.65 } }}>
                   Choose a live desk offer, accept the terms, release coin, upload proof, and chat with Thiago Desk until payment is complete.
                 </Typography>
-                <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
-                  <Button size="large" variant="contained" startIcon={<PaidIcon />} onClick={() => (user ? setActiveTab(0) : setAuthOpen(true))} sx={{ px: { xs: 2.5, md: 4 }, py: { xs: 1.15, md: 1.4 }, bgcolor: "#5757f6", boxShadow: "0 10px 24px rgba(87,87,246,0.22)" }}>Open live offer</Button>
-                  <Button size="large" variant="outlined" startIcon={<TrendingUpIcon />} sx={{ px: { xs: 2.5, md: 3.5 }, py: { xs: 1.15, md: 1.4 }, color: "#08133b", borderColor: "rgba(87,87,246,0.22)", bgcolor: "rgba(255,255,255,0.55)" }} onClick={() => setActiveTab(0)}>Browse rates</Button>
-                </Stack>
-                <RateNotifier rates={safeRates} />
+                <MarketSlider rates={safeRates} />
               </Stack>
             </Grid>
             <Grid item xs={12} md={5}>
@@ -254,7 +272,7 @@ function ExchangeApp() {
                             </Grid>
                           ))}
                         </Grid>
-                        <Button variant="contained" onClick={() => setActiveTab(0)} sx={{ bgcolor: "#5757f6" }}>
+                        <Button variant="contained" onClick={() => { setActiveTab(0); setTradeScreen("trade"); }} sx={{ bgcolor: "#5757f6" }}>
                           Continue Chat
                         </Button>
                       </>
@@ -262,7 +280,7 @@ function ExchangeApp() {
                       <>
                         <Typography variant="h4" sx={{ fontWeight: 1000, letterSpacing: "-0.04em", fontSize: { xs: 26, md: 34 } }}>No open trade</Typography>
                         <Typography color="text.secondary">Choose an offer to start a 30-minute secured chat.</Typography>
-                        <Button variant="outlined" onClick={() => setActiveTab(0)} sx={{ alignSelf: "flex-start" }}>
+                        <Button variant="outlined" onClick={() => { setActiveTab(0); setTradeScreen("offers"); }} sx={{ alignSelf: "flex-start" }}>
                           Choose Offer
                         </Button>
                       </>
@@ -280,12 +298,15 @@ function ExchangeApp() {
           <Box sx={{ px: { xs: 0.8, md: 2 }, pt: { xs: 0.8, md: 1.5 }, borderBottom: "1px solid rgba(87,87,246,0.12)" }}>
           <Tabs
             value={activeTab}
-            onChange={(_, value) => setActiveTab(value)}
-            variant="scrollable"
+            onChange={(_, value) => {
+              setActiveTab(value);
+              if (value !== 0) setSelectedRate(null);
+            }}
+            variant="fullWidth"
             allowScrollButtonsMobile
             sx={{
               minHeight: { xs: 52, md: 68 },
-              "& .MuiTabs-flexContainer": { gap: { xs: 0.6, md: 1 } },
+              "& .MuiTabs-flexContainer": { gap: { xs: 1.2, md: 2 }, justifyContent: "space-between" },
               "& .MuiTabs-indicator": {
                 display: "none"
               },
@@ -313,16 +334,17 @@ function ExchangeApp() {
             <Tab
               icon={<WalletIcon />}
               iconPosition="start"
-              label="Active Trade"
+              label="Offers"
             />
             <Tab icon={<HistoryIcon />} iconPosition="start" label="History" />
+            <Tab icon={<AccountCircleIcon />} iconPosition="start" label="Profile" />
           </Tabs>
           </Box>
 
           <Box sx={{ p: { xs: 1.25, md: 3 } }}>
             {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError("")}>{error}</Alert>}
             {success && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess("")}>{success}</Alert>}
-            {activeTab === 0 && activeTrade && token ? (
+            {activeTab === 0 && tradeScreen === "trade" && activeTrade && token ? (
               <TradeChat
                 trade={activeTrade}
                 token={token}
@@ -331,14 +353,168 @@ function ExchangeApp() {
                 onError={setError}
               />
             ) : activeTab === 0 && (
-              <TradeView rates={safeRates} trades={safeTrades} token={token} onRequireAuth={() => setAuthOpen(true)} onCreated={(trade) => { setTrades((items) => [trade, ...(Array.isArray(items) ? items : [])]); setSuccess("Trade opened. Chat thread started."); setActiveTab(0); window.setTimeout(() => loadTrades(), 250); }} onError={setError} />
+              <TradeView
+                rates={safeRates}
+                trades={safeTrades}
+                token={token}
+                selectedRate={selectedRate}
+                onSelectedRate={setSelectedRate}
+                onRequireAuth={() => setAuthOpen(true)}
+                onCreated={(trade) => {
+                  setTrades((items) => [trade, ...(Array.isArray(items) ? items : [])]);
+                  setSuccess("Trade opened. Trading ground started.");
+                  setActiveTab(0);
+                  setTradeScreen("trade");
+                  setSelectedRate(null);
+                  window.setTimeout(() => loadTrades(), 250);
+                }}
+                onError={setError}
+              />
             )}
             {activeTab === 1 && <HistoryView trades={safeTrades} token={token} onRefresh={() => loadTrades()} onError={setError} />}
+            {activeTab === 2 && (
+              <ProfileView
+                user={user}
+                token={token}
+                rates={safeRates}
+                onUser={updateUser}
+                onLogout={logout}
+                onError={setError}
+                onSuccess={setSuccess}
+              />
+            )}
           </Box>
         </Paper>
       </Container>
 
+      {activeTrade && (
+        <Button
+          variant="contained"
+          onClick={() => {
+            setActiveTab(0);
+            setTradeScreen("trade");
+            setSelectedRate(null);
+          }}
+          sx={{
+            position: "fixed",
+            right: { xs: 14, md: 28 },
+            bottom: { xs: 18, md: 28 },
+            zIndex: 20,
+            borderRadius: 999,
+            px: 2,
+            py: 1.2,
+            bgcolor: "#08133b",
+            boxShadow: "0 16px 42px rgba(8,19,59,0.28)",
+            "&::before": {
+              content: '""',
+              width: 10,
+              height: 10,
+              borderRadius: "50%",
+              bgcolor: "#19d27c",
+              mr: 1,
+              boxShadow: "0 0 0 6px rgba(25,210,124,0.18)"
+            }
+          }}
+          endIcon={<ArrowForwardIcon />}
+        >
+          Active trade
+        </Button>
+      )}
+
       <AuthDialog open={authOpen} mode={authMode} onMode={setAuthMode} onClose={() => user && setAuthOpen(false)} onSession={saveSession} onError={setError} />
     </Box>
   );
+}
+
+function MarketSlider({ rates }: { rates: Rate[] }) {
+  const featured = rates.filter((rate) => ["BTC", "ETH", "USDT"].includes(rate.coin.toUpperCase()));
+  const items = (featured.length ? featured : rates).slice(0, 6);
+  const logos = ["Binance", "Coinbase", "Kraken", "OKX"];
+
+  return (
+    <Box
+      sx={{
+        overflow: "hidden",
+        borderRadius: { xs: 4, md: 5 },
+        border: "1px solid rgba(87,87,246,0.14)",
+        bgcolor: "rgba(255,255,255,0.68)",
+        boxShadow: "0 12px 32px rgba(8,19,59,0.06)"
+      }}
+    >
+      <Stack
+        direction="row"
+        spacing={1.2}
+        sx={{
+          width: "max-content",
+          p: 1,
+          animation: "marketSlide 28s linear infinite",
+          "@keyframes marketSlide": {
+            "0%": { transform: "translateX(0)" },
+            "100%": { transform: "translateX(-50%)" }
+          }
+        }}
+      >
+        {[...items, ...items].map((rate, index) => (
+          <Box
+            key={`${rate.id}-${index}`}
+            sx={{
+              minWidth: { xs: 178, md: 220 },
+              p: 1.4,
+              borderRadius: 3,
+              bgcolor: "#fff",
+              border: "1px solid rgba(87,87,246,0.10)"
+            }}
+          >
+            <Stack direction="row" spacing={1} alignItems="center">
+              <Avatar sx={{ width: 34, height: 34, bgcolor: "#08133b", color: "#8fffb5", fontWeight: 1000 }}>
+                {rate.coin.slice(0, 1)}
+              </Avatar>
+              <Box>
+                <Typography sx={{ fontWeight: 1000, fontSize: 14 }}>{rate.coin} desk rate</Typography>
+                <Typography sx={{ fontWeight: 1000, color: "#5757f6" }}>{money(rate.buyRateNgn)} / $1</Typography>
+              </Box>
+            </Stack>
+          </Box>
+        ))}
+        {logos.map((name) => (
+          <Box
+            key={name}
+            sx={{
+              minWidth: 132,
+              p: 1.4,
+              borderRadius: 3,
+              bgcolor: "#08133b",
+              color: "#fff",
+              border: "1px solid rgba(255,255,255,0.16)"
+            }}
+          >
+            <Typography sx={{ fontWeight: 1000, fontSize: 14 }}>{name}</Typography>
+            <Typography sx={{ color: "rgba(255,255,255,0.66)", fontSize: 12 }}>market signal</Typography>
+          </Box>
+        ))}
+      </Stack>
+    </Box>
+  );
+}
+
+function playActiveTradeSound() {
+  try {
+    const AudioContextClass = window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+    if (!AudioContextClass) return;
+    const ctx = new AudioContextClass();
+    const oscillator = ctx.createOscillator();
+    const gain = ctx.createGain();
+    oscillator.type = "sine";
+    oscillator.frequency.setValueAtTime(880, ctx.currentTime);
+    oscillator.frequency.setValueAtTime(660, ctx.currentTime + 0.12);
+    gain.gain.setValueAtTime(0.001, ctx.currentTime);
+    gain.gain.exponentialRampToValueAtTime(0.18, ctx.currentTime + 0.02);
+    gain.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.28);
+    oscillator.connect(gain);
+    gain.connect(ctx.destination);
+    oscillator.start();
+    oscillator.stop(ctx.currentTime + 0.3);
+  } catch {
+    // Browsers can block sound until the user has interacted with the page.
+  }
 }

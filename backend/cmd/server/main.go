@@ -60,6 +60,7 @@ func main() {
 	mux.HandleFunc("POST /api/auth/register", authHandler.Register)
 	mux.HandleFunc("POST /api/auth/login", authHandler.Login)
 	mux.HandleFunc("GET /api/auth/me", auth.Middleware(cfg.JWTSecret, authRepo, authHandler.Me))
+	mux.HandleFunc("PATCH /api/auth/me", auth.Middleware(cfg.JWTSecret, authRepo, authHandler.UpdateMe))
 	mux.HandleFunc("GET /api/rates", rateHandler.List)
 	mux.HandleFunc("POST /api/trades", auth.Middleware(cfg.JWTSecret, authRepo, tradeHandler.Create))
 	mux.HandleFunc("GET /api/trades", auth.Middleware(cfg.JWTSecret, authRepo, tradeHandler.List))
