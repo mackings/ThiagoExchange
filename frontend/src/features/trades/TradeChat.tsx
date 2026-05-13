@@ -35,7 +35,8 @@ export function TradeChat({
   onTrade,
   onRefresh,
   onError,
-  compact = false
+  compact = false,
+  viewerRole = "user"
 }: {
   trade: Trade;
   token?: string;
@@ -43,6 +44,7 @@ export function TradeChat({
   onRefresh: () => void;
   onError: (message: string) => void;
   compact?: boolean;
+  viewerRole?: "user" | "admin";
 }) {
   const [message, setMessage] = useState("");
   const [hash, setHash] = useState(trade.transactionHash || "");
@@ -261,17 +263,18 @@ export function TradeChat({
             const isUser = item.sender === "user";
             const isAdmin = item.sender === "admin";
             const isSystem = item.sender === "system";
+            const isMine = item.sender === viewerRole;
             return (
-              <Stack key={item.id} direction="row" justifyContent={isUser ? "flex-end" : "flex-start"}>
+              <Stack key={item.id} direction="row" justifyContent={isMine ? "flex-end" : "flex-start"} sx={{ width: "100%" }}>
                 <Box
                   sx={{
                     maxWidth: isSystem ? { xs: "78%", md: "62%" } : { xs: "78%", md: "68%" },
                     px: { xs: 1.15, md: 1.35 },
                     py: { xs: 0.8, md: 0.95 },
-                    borderRadius: isUser ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
-                    bgcolor: isUser ? "#dcf8c6" : isSystem ? "#f7f8fa" : "#fff",
+                    borderRadius: isMine ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
+                    bgcolor: isMine ? "#dcf8c6" : isSystem ? "#f7f8fa" : "#fff",
                     color: "#08133b",
-                    border: isUser ? 0 : "1px solid rgba(8,19,59,0.07)",
+                    border: isMine ? 0 : "1px solid rgba(8,19,59,0.07)",
                     boxShadow: isSystem ? "none" : "0 6px 18px rgba(8,19,59,0.08)",
                     position: "relative",
                     "&::after": isSystem
@@ -282,10 +285,10 @@ export function TradeChat({
                           bottom: 0,
                           width: 10,
                           height: 10,
-                          bgcolor: isUser ? "#dcf8c6" : "#fff",
-                          right: isUser ? -3 : "auto",
-                          left: isUser ? "auto" : -3,
-                          clipPath: isUser ? "polygon(0 0, 100% 100%, 0 100%)" : "polygon(100% 0, 100% 100%, 0 100%)"
+                          bgcolor: isMine ? "#dcf8c6" : "#fff",
+                          right: isMine ? -3 : "auto",
+                          left: isMine ? "auto" : -3,
+                          clipPath: isMine ? "polygon(0 0, 100% 100%, 0 100%)" : "polygon(100% 0, 100% 100%, 0 100%)"
                         }
                   }}
                 >

@@ -83,6 +83,7 @@ export function AdminView({ token, rates, onRates, onError, onSuccess }: { token
               trade={selectedTrade}
               token={token}
               compact
+              viewerRole="admin"
               onTrade={(updated) => {
                 setSelectedTrade(updated);
                 setAdminTrades((items) => items.map((item) => item.id === updated.id ? updated : item));
