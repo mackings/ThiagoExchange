@@ -7,7 +7,7 @@ import Box from "@mui/material/Box";
 import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
 import { TradeChat } from "@/features/trades/TradeChat";
-import type { Session } from "@/features/auth/AuthDialog";
+import type { Session } from "@/features/auth/types";
 import type { Trade } from "@/shared/api";
 import { api } from "@/shared/api";
 import { readSession } from "@/shared/session";

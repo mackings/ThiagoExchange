@@ -11,7 +11,7 @@ import LinearProgress from "@mui/material/LinearProgress";
 import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
 import Typography from "@mui/material/Typography";
-import type { Session } from "@/features/auth/AuthDialog";
+import type { Session } from "@/features/auth/types";
 import type { Trade } from "@/shared/api";
 import { api, money, usd } from "@/shared/api";
 import { readSession } from "@/shared/session";

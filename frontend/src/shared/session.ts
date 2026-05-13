@@ -1,6 +1,6 @@
 "use client";
 
-import type { Session } from "@/features/auth/AuthDialog";
+import type { Session } from "@/features/auth/types";
 
 export const sessionKey = "thiago.session";
 

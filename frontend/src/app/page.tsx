@@ -31,7 +31,7 @@ import SecurityIcon from "@mui/icons-material/Security";
 import TimerIcon from "@mui/icons-material/Timer";
 import WalletIcon from "@mui/icons-material/Wallet";
 import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
-import { AuthDialog, AuthMode, Session } from "@/features/auth/AuthDialog";
+import type { Session } from "@/features/auth/types";
 import { HistoryView } from "@/features/trades/HistoryView";
 import { TradeView } from "@/features/trades/TradeView";
 import { API_HEALTH_URL, Rate, Trade, api, money, usd } from "@/shared/api";
@@ -58,8 +58,6 @@ function ExchangeApp() {
   const [rates, setRates] = useState<Rate[]>([]);
   const [trades, setTrades] = useState<Trade[]>([]);
   const [activeTab, setActiveTab] = useState(0);
-  const [authOpen, setAuthOpen] = useState(false);
-  const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [activeTradeSeen, setActiveTradeSeen] = useState("");
@@ -76,8 +74,6 @@ function ExchangeApp() {
     const saved = localStorage.getItem(sessionKey);
     if (saved) {
       setSession(JSON.parse(saved));
-    } else {
-      setAuthOpen(true);
     }
     loadRates();
   }, []);
@@ -132,18 +128,10 @@ function ExchangeApp() {
     }
   }
 
-  function saveSession(next: Session) {
-    localStorage.setItem(sessionKey, JSON.stringify(next));
-    setSession(next);
-    setAuthOpen(false);
-  }
-
   function logout() {
     localStorage.removeItem(sessionKey);
     setSession(null);
     setTrades([]);
-    setAuthMode("login");
-    setAuthOpen(true);
     setActiveTab(0);
   }
 
@@ -196,7 +184,7 @@ function ExchangeApp() {
               </Tooltip>
             </Stack>
           ) : (
-            <Button startIcon={<LoginIcon />} variant="contained" onClick={() => setAuthOpen(true)} sx={{ borderRadius: 999 }}>Sign in</Button>
+            <Button startIcon={<LoginIcon />} variant="contained" href="/login" sx={{ borderRadius: 999 }}>Sign in</Button>
           )}
         </Toolbar>
       </AppBar>
@@ -393,7 +381,9 @@ function ExchangeApp() {
                 onViewOffer={(rate) => {
                   window.location.href = `/offers/${rate.id}`;
                 }}
-                onRequireAuth={() => setAuthOpen(true)}
+                onRequireAuth={() => {
+                  window.location.href = "/login?next=/";
+                }}
                 onCreated={(trade) => {
                   setTrades((items) => [trade, ...(Array.isArray(items) ? items : [])]);
                   setSuccess("Trade opened. Trading ground started.");
@@ -444,7 +434,6 @@ function ExchangeApp() {
         </Button>
       )}
 
-      <AuthDialog open={authOpen} mode={authMode} onMode={setAuthMode} onClose={() => user && setAuthOpen(false)} onSession={saveSession} onError={setError} />
     </Box>
   );
 }

@@ -7,7 +7,7 @@ import Grid from "@mui/material/Grid";
 import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
 import { TradeView } from "@/features/trades/TradeView";
-import type { Session } from "@/features/auth/AuthDialog";
+import type { Session } from "@/features/auth/types";
 import type { Rate, Trade } from "@/shared/api";
 import { api } from "@/shared/api";
 import { readSession } from "@/shared/session";
@@ -68,7 +68,7 @@ export default function OfferDetailsPage() {
               window.location.href = "/";
             }}
             onRequireAuth={() => {
-              window.location.href = "/";
+              window.location.href = `/login?next=/offers/${params.id}`;
             }}
             onCreated={(trade) => {
               window.location.href = `/trades/${trade.id}`;

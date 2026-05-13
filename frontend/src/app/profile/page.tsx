@@ -6,7 +6,7 @@ import Grid from "@mui/material/Grid";
 import Skeleton from "@mui/material/Skeleton";
 import Stack from "@mui/material/Stack";
 import { ProfileView } from "@/features/profile/ProfileView";
-import type { Session } from "@/features/auth/AuthDialog";
+import type { Session } from "@/features/auth/types";
 import type { Rate } from "@/shared/api";
 import { api } from "@/shared/api";
 import { clearSession, readSession, writeSession } from "@/shared/session";
