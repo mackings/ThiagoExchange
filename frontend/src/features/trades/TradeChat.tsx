@@ -9,7 +9,6 @@ import Chip from "@mui/material/Chip";
 import Divider from "@mui/material/Divider";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
-import Paper from "@mui/material/Paper";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Tooltip from "@mui/material/Tooltip";
@@ -154,22 +153,19 @@ export function TradeChat({
   }
 
   return (
-    <Paper
-      variant="outlined"
+    <Stack
+      spacing={{ xs: 1.5, md: 2 }}
       sx={{
-        overflow: "hidden",
-        borderRadius: { xs: 4, md: 6 },
-        background: "#fff",
-        borderColor: "rgba(87,87,246,0.14)",
-        boxShadow: "0 16px 48px rgba(8,19,59,0.08)"
+        minHeight: compact ? "auto" : { xs: "calc(100vh - 156px)", md: "calc(100vh - 190px)" }
       }}
     >
       <Box
         sx={{
-          p: { xs: 1.6, md: 3 },
-          color: "#08133b",
-          background: "linear-gradient(135deg, rgba(246,248,255,0.96), rgba(255,247,253,0.96))",
-          borderBottom: "1px solid rgba(87,87,246,0.12)"
+          p: { xs: 1.6, md: 2.6 },
+          color: "#fff",
+          borderRadius: { xs: 4, md: 5 },
+          background: "linear-gradient(135deg, #08133b 0%, #2634a5 58%, #0f7a62 100%)",
+          boxShadow: "0 18px 48px rgba(8,19,59,0.16)"
         }}
       >
         <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" spacing={2}>
@@ -182,7 +178,7 @@ export function TradeChat({
                 <Typography variant={compact ? "subtitle1" : "h6"} sx={{ fontWeight: 1000, fontSize: { xs: 16, md: compact ? 16 : 20 } }}>
                   {trade.coin} trade thread
                 </Typography>
-                <Typography variant="body2" color="text.secondary">
+                <Typography variant="body2" sx={{ color: "rgba(255,255,255,0.72)" }}>
                   {usd(trade.amountUsd)} on {trade.network}
                 </Typography>
               </Box>
@@ -203,7 +199,7 @@ export function TradeChat({
         </Stack>
       </Box>
 
-      <Stack spacing={{ xs: 1.5, md: 2.3 }} sx={{ p: { xs: 1.25, md: 3 } }}>
+      <Stack spacing={{ xs: 1.5, md: 2 }} sx={{ flex: 1, minHeight: 0 }}>
         <Alert severity="info" icon={<WalletIcon />} sx={{ borderRadius: 4, bgcolor: "#f7f8ff", color: "#08133b", border: "1px solid rgba(87,87,246,0.12)" }}>
           Send coin to <strong>{trade.walletAddress}</strong>
           <Tooltip title="Copy wallet">
@@ -213,7 +209,19 @@ export function TradeChat({
           </Tooltip>
         </Alert>
 
-        <Stack spacing={1.2} sx={{ maxHeight: compact ? 320 : { xs: 380, md: 460 }, overflowY: "auto", pr: 0.5, p: { xs: 0, md: 1 }, bgcolor: "#fbfcff", borderRadius: { xs: 4, md: 5 }, border: "1px solid rgba(87,87,246,0.08)" }}>
+        <Stack
+          spacing={1.2}
+          sx={{
+            flex: 1,
+            minHeight: compact ? 320 : { xs: "50vh", md: "56vh" },
+            maxHeight: compact ? 320 : "none",
+            overflowY: "auto",
+            pr: 0.5,
+            p: { xs: 0.2, md: 1 },
+            background: "linear-gradient(180deg, rgba(247,248,255,0.64), rgba(255,255,255,0.28))",
+            borderRadius: { xs: 4, md: 5 }
+          }}
+        >
           {messages.map((item) => {
             const mine = item.sender === "user";
             return (
@@ -284,7 +292,7 @@ export function TradeChat({
                 sx={{ alignSelf: "flex-start" }}
               />
             )}
-            <Stack direction={{ xs: "column", md: "row" }} spacing={1} sx={{ p: 1, borderRadius: 5, bgcolor: "#f7f8ff", border: "1px solid rgba(87,87,246,0.12)" }}>
+            <Stack direction={{ xs: "column", md: "row" }} spacing={1} sx={{ p: 1, borderRadius: 5, bgcolor: "rgba(255,255,255,0.86)", border: "1px solid rgba(87,87,246,0.12)", boxShadow: "0 12px 34px rgba(8,19,59,0.08)" }}>
               <TextField
                 label="Type account details or message"
                 value={message}
@@ -314,6 +322,6 @@ export function TradeChat({
           <Alert severity={trade.status === "paid" ? "success" : "warning"}>{trade.receiptNote || `This trade is ${trade.status}.`}</Alert>
         )}
       </Stack>
-    </Paper>
+    </Stack>
   );
 }

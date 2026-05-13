@@ -15,6 +15,7 @@ import {
   Grid,
   IconButton,
   Paper,
+  Skeleton,
   Stack,
   Tab,
   Tabs,
@@ -69,6 +70,7 @@ function ExchangeApp() {
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
   const [activeTradeSeen, setActiveTradeSeen] = useState("");
+  const [ratesLoading, setRatesLoading] = useState(true);
 
   const token = session?.token;
   const user = session?.user;
@@ -116,11 +118,14 @@ function ExchangeApp() {
   }, []);
 
   async function loadRates() {
+    setRatesLoading(true);
     try {
       const payload = await api<Rate[]>("/rates");
       setRates(Array.isArray(payload) ? payload : []);
     } catch (err) {
       setError((err as Error).message);
+    } finally {
+      setRatesLoading(false);
     }
   }
 
@@ -159,11 +164,7 @@ function ExchangeApp() {
             mt: { xs: 0, md: 1 },
             px: { xs: 1.4, md: 3 },
             py: { xs: 0.8, md: 1.6 },
-            minHeight: { xs: 64, md: 92 },
-            borderRadius: { xs: 3.5, md: 999 },
-            bgcolor: "rgba(255,255,255,0.84)",
-            border: "1px solid rgba(87,87,246,0.14)",
-            boxShadow: "0 14px 38px rgba(8,19,59,0.08)"
+            minHeight: { xs: 64, md: 92 }
           }}
         >
           <Image src="/thiago-logo.svg" alt="Thiago Exchange" width={150} height={40} priority />
@@ -199,7 +200,7 @@ function ExchangeApp() {
               </Tooltip>
             </Stack>
           ) : (
-            <Button startIcon={<LoginIcon />} variant="contained" onClick={() => setAuthOpen(true)}>Sign in</Button>
+            <Button startIcon={<LoginIcon />} variant="contained" onClick={() => setAuthOpen(true)} sx={{ borderRadius: 999 }}>Sign in</Button>
           )}
         </Toolbar>
       </AppBar>
@@ -242,12 +243,34 @@ function ExchangeApp() {
               </Stack>
             </Grid>
             <Grid item xs={12} md={5}>
-              <Card sx={{ bgcolor: "#fff", color: "text.primary", border: "1px solid rgba(87,87,246,0.14)", borderRadius: { xs: 4, md: 6 }, boxShadow: "0 18px 48px rgba(8,19,59,0.09)" }}>
-                <CardContent sx={{ p: { xs: 2, md: 4 } }}>
+              <Card
+                sx={{
+                  color: "#fff",
+                  border: "1px solid rgba(255,255,255,0.36)",
+                  borderRadius: { xs: 4, md: 6 },
+                  boxShadow: "0 22px 58px rgba(8,19,59,0.14)",
+                  background: activeTrade
+                    ? "linear-gradient(145deg, #08133b 0%, #2634a5 56%, #0f7a62 100%)"
+                    : "linear-gradient(145deg, #ffffff 0%, #f7f8ff 100%)"
+                }}
+              >
+                <CardContent sx={{ p: { xs: 2, md: 3.5 } }}>
                   <Stack spacing={{ xs: 1.7, md: 2.5 }}>
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
-                      <Chip size="small" label="LIVE TRADE STATUS" sx={{ letterSpacing: 2.2, fontWeight: 1000, color: "#2331a6", bgcolor: "#f0efff" }} />
-                      <TimerIcon sx={{ color: "#5757f6" }} />
+                      <Chip
+                        size="small"
+                        label="LIVE TRADE STATUS"
+                        sx={{
+                          letterSpacing: 1.8,
+                          fontWeight: 1000,
+                          color: activeTrade ? "#fff" : "#2331a6",
+                          bgcolor: activeTrade ? "rgba(255,255,255,0.16)" : "#f0efff",
+                          border: activeTrade ? "1px solid rgba(255,255,255,0.18)" : 0
+                        }}
+                      />
+                      <Box sx={{ width: 42, height: 42, display: "grid", placeItems: "center", borderRadius: "50%", bgcolor: activeTrade ? "rgba(255,255,255,0.14)" : "#f0efff" }}>
+                        <TimerIcon sx={{ color: activeTrade ? "#fff" : "#5757f6" }} />
+                      </Box>
                     </Stack>
                     {activeTrade ? (
                       <>
@@ -256,7 +279,7 @@ function ExchangeApp() {
                             <Typography variant="h4" sx={{ fontWeight: 1000, letterSpacing: "-0.04em", fontSize: { xs: 24, md: 34 } }}>
                               {activeTrade.coin} {usd(activeTrade.amountUsd)}
                             </Typography>
-                            <Typography color="text.secondary" sx={{ mt: 0.5 }}>
+                            <Typography sx={{ mt: 0.5, color: "rgba(255,255,255,0.72)" }}>
                               Expected payout {money(activeTrade.expectedNgn)}
                             </Typography>
                           </Box>
@@ -271,20 +294,20 @@ function ExchangeApp() {
                             ["Chat", `${activeTrade.messages?.length || 0} messages`]
                           ].map(([label, value]) => (
                             <Grid item xs={6} key={label}>
-                              <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: "#f8f8ff", border: "1px solid rgba(87,87,246,0.10)" }}>
-                                <Typography variant="caption" color="text.secondary" sx={{ fontWeight: 800 }}>{label}</Typography>
+                              <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.14)" }}>
+                                <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.64)", fontWeight: 800 }}>{label}</Typography>
                                 <Typography sx={{ fontWeight: 1000, wordBreak: "break-word" }}>{value}</Typography>
                               </Box>
                             </Grid>
                           ))}
                         </Grid>
-                        <Button variant="contained" href={`/trades/${activeTrade.id}`} sx={{ bgcolor: "#5757f6" }}>
+                        <Button variant="contained" href={`/trades/${activeTrade.id}`} sx={{ bgcolor: "#fff", color: "#08133b", borderRadius: 999, "&:hover": { bgcolor: "#f3f4ff" } }}>
                           Continue Chat
                         </Button>
                       </>
                     ) : (
                       <>
-                        <Typography variant="h4" sx={{ fontWeight: 1000, letterSpacing: "-0.04em", fontSize: { xs: 26, md: 34 } }}>No open trade</Typography>
+                        <Typography variant="h4" sx={{ color: "#08133b", fontWeight: 1000, letterSpacing: "-0.04em", fontSize: { xs: 26, md: 34 } }}>No open trade</Typography>
                         <Typography color="text.secondary">Choose an offer to start a 30-minute secured chat.</Typography>
                         <Button variant="outlined" onClick={() => setActiveTab(0)} sx={{ alignSelf: "flex-start" }}>
                           Choose Offer
@@ -344,7 +367,8 @@ function ExchangeApp() {
           <Box sx={{ p: { xs: 1.25, md: 3 } }}>
             {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError("")}>{error}</Alert>}
             {success && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess("")}>{success}</Alert>}
-            {activeTab === 0 && (
+            {activeTab === 0 && ratesLoading && !safeRates.length && <OffersSkeleton />}
+            {activeTab === 0 && (!ratesLoading || safeRates.length > 0) && (
               <TradeView
                 rates={safeRates}
                 trades={safeTrades}
@@ -522,6 +546,42 @@ function MarketSlider({ rates }: { rates: Rate[] }) {
         ))}
       </Stack>
     </Box>
+  );
+}
+
+function OffersSkeleton() {
+  return (
+    <Stack spacing={{ xs: 2, md: 3 }}>
+      <Box>
+        <Skeleton variant="text" width={160} height={38} />
+        <Skeleton variant="text" width="70%" />
+      </Box>
+      <Grid container spacing={{ xs: 1.5, md: 2.5 }}>
+        {[0, 1, 2, 3, 4, 5].map((item) => (
+          <Grid item xs={12} md={6} lg={4} key={item}>
+            <Card variant="outlined" sx={{ borderRadius: { xs: 4, md: 5 }, borderColor: "rgba(87,87,246,0.10)" }}>
+              <CardContent sx={{ p: { xs: 1.5, md: 2.5 } }}>
+                <Stack spacing={{ xs: 1.6, md: 2.2 }}>
+                  <Stack direction="row" justifyContent="space-between" alignItems="center">
+                    <Stack direction="row" spacing={1.4} alignItems="center">
+                      <Skeleton variant="circular" width={42} height={42} />
+                      <Box>
+                        <Skeleton variant="text" width={120} height={28} />
+                        <Skeleton variant="text" width={90} />
+                      </Box>
+                    </Stack>
+                    <Skeleton variant="rounded" width={96} height={28} sx={{ borderRadius: 999 }} />
+                  </Stack>
+                  <Skeleton variant="rounded" height={94} sx={{ borderRadius: 4 }} />
+                  <Skeleton variant="rounded" height={36} width="82%" sx={{ borderRadius: 999 }} />
+                  <Skeleton variant="rounded" height={44} sx={{ borderRadius: 999 }} />
+                </Stack>
+              </CardContent>
+            </Card>
+          </Grid>
+        ))}
+      </Grid>
+    </Stack>
   );
 }
 
