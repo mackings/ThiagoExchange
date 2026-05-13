@@ -245,13 +245,22 @@ function ExchangeApp() {
             <Grid item xs={12} md={5}>
               <Card
                 sx={{
-                  color: "#fff",
-                  border: "1px solid rgba(255,255,255,0.36)",
-                  borderRadius: { xs: 4, md: 6 },
-                  boxShadow: "0 22px 58px rgba(8,19,59,0.14)",
-                  background: activeTrade
-                    ? "linear-gradient(145deg, #08133b 0%, #2634a5 56%, #0f7a62 100%)"
-                    : "linear-gradient(145deg, #ffffff 0%, #f7f8ff 100%)"
+                  color: "#08133b",
+                  border: "1px solid rgba(8,19,59,0.10)",
+                  borderRadius: { xs: 3, md: 4 },
+                  boxShadow: "0 24px 70px rgba(8,19,59,0.12)",
+                  background: "#fff",
+                  position: "relative",
+                  overflow: "hidden",
+                  "&::before": activeTrade
+                    ? {
+                        content: "\"\"",
+                        position: "absolute",
+                        inset: "0 auto 0 0",
+                        width: 6,
+                        bgcolor: activeTrade.status === "confirmed" ? "#0f7a62" : "#d49416"
+                      }
+                    : undefined
                 }}
               >
                 <CardContent sx={{ p: { xs: 2, md: 3.5 } }}>
@@ -263,12 +272,12 @@ function ExchangeApp() {
                         sx={{
                           letterSpacing: 1.8,
                           fontWeight: 1000,
-                          color: activeTrade ? "#fff" : "#2331a6",
-                          bgcolor: activeTrade ? "rgba(255,255,255,0.16)" : "#f0efff",
-                          border: activeTrade ? "1px solid rgba(255,255,255,0.18)" : 0
+                          color: activeTrade ? "#08133b" : "#53627c",
+                          bgcolor: activeTrade ? "#f6f7fb" : "#f8fafc",
+                          border: "1px solid rgba(8,19,59,0.08)"
                         }}
                       />
-                      <Box sx={{ width: 42, height: 42, display: "grid", placeItems: "center", borderRadius: "50%", bgcolor: activeTrade ? "rgba(255,255,255,0.14)" : "#f0efff" }}>
+                      <Box sx={{ width: 44, height: 44, display: "grid", placeItems: "center", borderRadius: "50%", bgcolor: activeTrade ? "#08133b" : "#f0efff", boxShadow: activeTrade ? "0 10px 24px rgba(8,19,59,0.18)" : "none" }}>
                         <TimerIcon sx={{ color: activeTrade ? "#fff" : "#5757f6" }} />
                       </Box>
                     </Stack>
@@ -279,7 +288,7 @@ function ExchangeApp() {
                             <Typography variant="h4" sx={{ fontWeight: 1000, letterSpacing: "-0.04em", fontSize: { xs: 24, md: 34 } }}>
                               {activeTrade.coin} {usd(activeTrade.amountUsd)}
                             </Typography>
-                            <Typography sx={{ mt: 0.5, color: "rgba(255,255,255,0.72)" }}>
+                            <Typography sx={{ mt: 0.5, color: "#64708a" }}>
                               Expected payout {money(activeTrade.expectedNgn)}
                             </Typography>
                           </Box>
@@ -294,14 +303,14 @@ function ExchangeApp() {
                             ["Chat", `${activeTrade.messages?.length || 0} messages`]
                           ].map(([label, value]) => (
                             <Grid item xs={6} key={label}>
-                              <Box sx={{ p: 1.5, borderRadius: 3, bgcolor: "rgba(255,255,255,0.12)", border: "1px solid rgba(255,255,255,0.14)" }}>
-                                <Typography variant="caption" sx={{ color: "rgba(255,255,255,0.64)", fontWeight: 800 }}>{label}</Typography>
+                              <Box sx={{ p: 1.5, minHeight: 86, borderRadius: 2, bgcolor: "#f8fafc", border: "1px solid rgba(8,19,59,0.08)" }}>
+                                <Typography variant="caption" sx={{ color: "#64708a", fontWeight: 800 }}>{label}</Typography>
                                 <Typography sx={{ fontWeight: 1000, wordBreak: "break-word" }}>{value}</Typography>
                               </Box>
                             </Grid>
                           ))}
                         </Grid>
-                        <Button variant="contained" href={`/trades/${activeTrade.id}`} sx={{ bgcolor: "#fff", color: "#08133b", borderRadius: 999, "&:hover": { bgcolor: "#f3f4ff" } }}>
+                        <Button variant="contained" href={`/trades/${activeTrade.id}`} sx={{ bgcolor: "#08133b", color: "#fff", borderRadius: 999, "&:hover": { bgcolor: "#050b24" } }}>
                           Continue Chat
                         </Button>
                       </>
