@@ -11,10 +11,11 @@ import ListItemText from "@mui/material/ListItemText";
 import Stack from "@mui/material/Stack";
 import TextField from "@mui/material/TextField";
 import Typography from "@mui/material/Typography";
+import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
 import ForumIcon from "@mui/icons-material/Forum";
 import PaymentsIcon from "@mui/icons-material/Payments";
 import PriceCheckIcon from "@mui/icons-material/PriceCheck";
-import type { Rate, Trade } from "@/shared/api";
+import type { GiftCardOrder, Rate, Trade } from "@/shared/api";
 import { api, money, usd } from "@/shared/api";
 import { StatusChip } from "@/shared/ui/StatusChip";
 import { CoinIcon } from "@/shared/ui/CoinIcon";
@@ -22,16 +23,27 @@ import { TradeChat } from "@/features/trades/TradeChat";
 
 export function AdminView({ token, rates, onRates, onError, onSuccess }: { token: string; rates: Rate[]; onRates: (rates: Rate[]) => void; onError: (message: string) => void; onSuccess: (message: string) => void }) {
   const [adminTrades, setAdminTrades] = useState<Trade[]>([]);
+  const [giftCardOrders, setGiftCardOrders] = useState<GiftCardOrder[]>([]);
   const [selectedTrade, setSelectedTrade] = useState<Trade | null>(null);
 
   useEffect(() => {
     loadAdminTrades();
+    loadGiftCardOrders();
   }, []);
 
   async function loadAdminTrades() {
     try {
       const payload = await api<Trade[]>("/admin/trades", {}, token);
       setAdminTrades(Array.isArray(payload) ? payload : []);
+    } catch (err) {
+      onError((err as Error).message);
+    }
+  }
+
+  async function loadGiftCardOrders() {
+    try {
+      const payload = await api<GiftCardOrder[]>("/admin/giftcards/orders", {}, token);
+      setGiftCardOrders(Array.isArray(payload) ? payload : []);
     } catch (err) {
       onError((err as Error).message);
     }
@@ -80,6 +92,31 @@ export function AdminView({ token, rates, onRates, onError, onSuccess }: { token
         </Stack>
       </Grid>
       <Grid item xs={12} lg={7}>
+        <Typography variant="h6" sx={{ fontWeight: 1000, mb: 2 }}>Gift Card Queue</Typography>
+        <List disablePadding sx={{ mb: 3 }}>
+          {giftCardOrders.length === 0 && (
+            <ListItem sx={{ bgcolor: "#fff", mb: 1.5, borderRadius: 2, border: "1px solid rgba(0,0,0,0.08)" }}>
+              <ListItemText primary="No gift card submissions yet." />
+            </ListItem>
+          )}
+          {giftCardOrders.map((order) => (
+            <ListItem key={order.id} sx={{ bgcolor: "#fff", mb: 1.5, borderRadius: 2, border: "1px solid rgba(37,99,235,0.12)", alignItems: "flex-start" }}>
+              <ListItemText
+                primary={
+                  <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+                    <CardGiftcardIcon sx={{ color: "#1d4ed8" }} />
+                    <Typography sx={{ fontWeight: 1000 }}>{order.userName} - {order.categoryName || order.giftcardName}</Typography>
+                  </Stack>
+                }
+                secondary={`${usd(order.amount)} | ${order.providerReference || "No Prestmit reference"} | ${order.providerMessage || order.providerStatus || "Pending"}`}
+              />
+              <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
+                <Button size="small" variant="outlined" onClick={() => navigator.clipboard?.writeText(order.providerReference || order.id)}>Copy ref</Button>
+              </Stack>
+            </ListItem>
+          ))}
+        </List>
+
         <Typography variant="h6" sx={{ fontWeight: 1000, mb: 2 }}>Verify Trades</Typography>
         {selectedTrade && (
           <Stack spacing={1.5} sx={{ mb: 2 }}>

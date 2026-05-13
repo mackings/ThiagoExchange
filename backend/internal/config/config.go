@@ -8,19 +8,22 @@ import (
 )
 
 type Config struct {
-	AppName     string
-	Port        string
-	MongoURI    string
-	MongoDB     string
-	JWTSecret   string
-	AdminEmails map[string]bool
-	SMTPHost    string
-	SMTPPort    string
-	SMTPUser    string
-	SMTPPass    string
-	SMTPFrom    string
-	FrontendURL string
-	BackendURL  string
+	AppName            string
+	Port               string
+	MongoURI           string
+	MongoDB            string
+	JWTSecret          string
+	AdminEmails        map[string]bool
+	SMTPHost           string
+	SMTPPort           string
+	SMTPUser           string
+	SMTPPass           string
+	SMTPFrom           string
+	FrontendURL        string
+	BackendURL         string
+	PrestmitAPIBaseURL string
+	PrestmitAPIKey     string
+	PrestmitAPISecret  string
 }
 
 func Load() Config {
@@ -34,19 +37,22 @@ func Load() Config {
 	}
 
 	return Config{
-		AppName:     env("APP_NAME", "Thiago Exchange"),
-		Port:        env("PORT", "8080"),
-		MongoURI:    env("MONGODB_URI", "mongodb://localhost:27017"),
-		MongoDB:     env("MONGODB_DATABASE", "thiago_exchange"),
-		JWTSecret:   env("JWT_SECRET", "dev-secret"),
-		AdminEmails: admins,
-		SMTPHost:    env("SMTP_HOST", "smtp.gmail.com"),
-		SMTPPort:    env("SMTP_PORT", "587"),
-		SMTPUser:    os.Getenv("SMTP_USER"),
-		SMTPPass:    os.Getenv("SMTP_PASS"),
-		SMTPFrom:    env("SMTP_FROM_NAME", "Thiago Exchange"),
-		FrontendURL: env("FRONTEND_URL", "http://localhost:3000"),
-		BackendURL:  env("BACKEND_URL", os.Getenv("RENDER_EXTERNAL_URL")),
+		AppName:            env("APP_NAME", "Thiago Exchange"),
+		Port:               env("PORT", "8080"),
+		MongoURI:           env("MONGODB_URI", "mongodb://localhost:27017"),
+		MongoDB:            env("MONGODB_DATABASE", "thiago_exchange"),
+		JWTSecret:          env("JWT_SECRET", "dev-secret"),
+		AdminEmails:        admins,
+		SMTPHost:           env("SMTP_HOST", "smtp.gmail.com"),
+		SMTPPort:           env("SMTP_PORT", "587"),
+		SMTPUser:           os.Getenv("SMTP_USER"),
+		SMTPPass:           os.Getenv("SMTP_PASS"),
+		SMTPFrom:           env("SMTP_FROM_NAME", "Thiago Exchange"),
+		FrontendURL:        env("FRONTEND_URL", "http://localhost:3000"),
+		BackendURL:         env("BACKEND_URL", os.Getenv("RENDER_EXTERNAL_URL")),
+		PrestmitAPIBaseURL: env("PRESTMIT_API_BASE_URL", "https://dev-api.prestmit.io/partners/v1"),
+		PrestmitAPIKey:     os.Getenv("PRESTMIT_API_KEY"),
+		PrestmitAPISecret:  os.Getenv("PRESTMIT_API_SECRET"),
 	}
 }
 

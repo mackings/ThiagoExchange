@@ -50,6 +50,66 @@ export type TradeMessage = {
   createdAt: string;
 };
 
+export type GiftCardCategory = {
+  id: number;
+  name: string;
+  image?: string;
+};
+
+export type SellableGiftCard = {
+  id: number;
+  name: string;
+  rate: number;
+  minimum: number;
+  form: string;
+  country: string;
+  terms: string;
+  category: GiftCardCategory;
+};
+
+export type GiftCardPayoutMethod = {
+  name: string;
+  available: boolean;
+};
+
+export type GiftCardConfig = {
+  configured: boolean;
+  giftCardCategories: GiftCardCategory[];
+  sellableGiftcards: SellableGiftCard[];
+  sellGiftcardPayoutMethods: GiftCardPayoutMethod[];
+};
+
+export type GiftCardAttachment = {
+  name: string;
+  contentType: string;
+  data: string;
+};
+
+export type GiftCardOrder = {
+  id: string;
+  userId: string;
+  userName: string;
+  userEmail: string;
+  giftcardId: number;
+  giftcardName: string;
+  categoryName: string;
+  amount: number;
+  rate: number;
+  expectedPayoutNgn: number;
+  payoutMethod: string;
+  payoutAddress?: string;
+  cardCodeMasked?: string;
+  pinMasked?: string;
+  attachmentCount: number;
+  provider: string;
+  providerReference?: string;
+  providerStatus?: string;
+  providerMessage?: string;
+  status: "pending" | "submitted" | "completed" | "rejected" | "failed";
+  createdAt: string;
+  updatedAt: string;
+};
+
 export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
 export const API_HEALTH_URL = API_URL.replace(/\/api\/?$/, "/health");
 

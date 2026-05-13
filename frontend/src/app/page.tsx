@@ -30,6 +30,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import SecurityIcon from "@mui/icons-material/Security";
 import TimerIcon from "@mui/icons-material/Timer";
 import WalletIcon from "@mui/icons-material/Wallet";
+import CardGiftcardIcon from "@mui/icons-material/CardGiftcard";
 import { AuthDialog, AuthMode, Session } from "@/features/auth/AuthDialog";
 import { HistoryView } from "@/features/trades/HistoryView";
 import { TradeView } from "@/features/trades/TradeView";
@@ -179,6 +180,9 @@ function ExchangeApp() {
                 {item}
               </Button>
             ))}
+            <Button href="/giftcards" startIcon={<CardGiftcardIcon />} sx={{ px: 2.3, color: "#1d4ed8", bgcolor: "#eaf2ff", "&:hover": { bgcolor: "#dbeafe" } }}>
+              Gift Cards
+            </Button>
           </Stack>
           {user ? (
             <Stack direction="row" spacing={1} alignItems="center">
@@ -368,6 +372,11 @@ function ExchangeApp() {
               <Tab icon={<WalletIcon />} iconPosition="start" label="Offers" />
               <Tab icon={<HistoryIcon />} iconPosition="start" label="History" />
             </Tabs>
+            <Box sx={{ display: { xs: "block", md: "none" }, px: 0.4, pb: 0.8 }}>
+              <Button href="/giftcards" fullWidth startIcon={<CardGiftcardIcon />} sx={{ borderRadius: 999, bgcolor: "#eaf2ff", color: "#1d4ed8", fontWeight: 900 }}>
+                Sell gift cards
+              </Button>
+            </Box>
           </Box>
 
           <Box sx={{ p: { xs: 1.25, md: 3 } }}>

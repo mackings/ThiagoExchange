@@ -9,6 +9,7 @@ import (
 
 	"thiagoxchange/backend/internal/config"
 	"thiagoxchange/backend/internal/features/auth"
+	"thiagoxchange/backend/internal/features/giftcards"
 	"thiagoxchange/backend/internal/features/rates"
 	"thiagoxchange/backend/internal/features/trades"
 	"thiagoxchange/backend/internal/platform/database"
@@ -30,6 +31,7 @@ func main() {
 	}()
 
 	authRepo := auth.NewRepository(db)
+	giftCardRepo := giftcards.NewRepository(db)
 	rateRepo := rates.NewRepository(db)
 	tradeRepo := trades.NewRepository(db)
 	tradeHub := trades.NewHub()
@@ -43,6 +45,7 @@ func main() {
 	}
 
 	authHandler := auth.NewHandler(auth.NewService(cfg, authRepo, mailer))
+	giftCardHandler := giftcards.NewHandler(giftcards.NewService(giftCardRepo, giftcards.NewPrestmitClient(cfg)))
 	rateHandler := rates.NewHandler(rateRepo)
 	tradeHandler := trades.NewHandler(trades.NewService(tradeRepo, rateRepo, mailer), tradeHub, authRepo, cfg.JWTSecret)
 
@@ -62,6 +65,11 @@ func main() {
 	mux.HandleFunc("GET /api/auth/me", auth.Middleware(cfg.JWTSecret, authRepo, authHandler.Me))
 	mux.HandleFunc("PATCH /api/auth/me", auth.Middleware(cfg.JWTSecret, authRepo, authHandler.UpdateMe))
 	mux.HandleFunc("GET /api/rates", rateHandler.List)
+	mux.HandleFunc("GET /api/giftcards/config", auth.Middleware(cfg.JWTSecret, authRepo, giftCardHandler.Config))
+	mux.HandleFunc("POST /api/giftcards/orders", auth.Middleware(cfg.JWTSecret, authRepo, giftCardHandler.Submit))
+	mux.HandleFunc("GET /api/giftcards/orders", auth.Middleware(cfg.JWTSecret, authRepo, giftCardHandler.List))
+	mux.HandleFunc("GET /api/giftcards/orders/{id}", auth.Middleware(cfg.JWTSecret, authRepo, giftCardHandler.Get))
+	mux.HandleFunc("POST /api/giftcards/orders/{id}/refresh", auth.Middleware(cfg.JWTSecret, authRepo, giftCardHandler.Refresh))
 	mux.HandleFunc("POST /api/trades", auth.Middleware(cfg.JWTSecret, authRepo, tradeHandler.Create))
 	mux.HandleFunc("GET /api/trades", auth.Middleware(cfg.JWTSecret, authRepo, tradeHandler.List))
 	mux.HandleFunc("GET /api/trades/{id}", auth.Middleware(cfg.JWTSecret, authRepo, tradeHandler.Get))
@@ -70,6 +78,7 @@ func main() {
 	mux.HandleFunc("PATCH /api/trades/{id}/cancel", auth.Middleware(cfg.JWTSecret, authRepo, tradeHandler.Cancel))
 	mux.HandleFunc("GET /api/trades/{id}/ws", tradeHandler.WebSocket)
 	mux.HandleFunc("PUT /api/admin/rates/{id}", auth.Admin(cfg.JWTSecret, authRepo, rateHandler.Update))
+	mux.HandleFunc("GET /api/admin/giftcards/orders", auth.Admin(cfg.JWTSecret, authRepo, giftCardHandler.AdminList))
 	mux.HandleFunc("GET /api/admin/trades", auth.Admin(cfg.JWTSecret, authRepo, tradeHandler.AdminList))
 	mux.HandleFunc("PATCH /api/admin/trades/{id}/status", auth.Admin(cfg.JWTSecret, authRepo, tradeHandler.SetStatus))
 

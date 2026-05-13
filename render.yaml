@@ -32,6 +32,12 @@ services:
         value: https://thiagoxchange-web.onrender.com
       - key: BACKEND_URL
         value: https://thiagoxchange-api.onrender.com
+      - key: PRESTMIT_API_BASE_URL
+        value: https://dev-api.prestmit.io/partners/v1
+      - key: PRESTMIT_API_KEY
+        sync: false
+      - key: PRESTMIT_API_SECRET
+        sync: false
 
   - type: web
     name: thiagoxchange-web
