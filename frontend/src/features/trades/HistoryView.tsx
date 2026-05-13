@@ -48,7 +48,7 @@ export function HistoryView({
   }
 
   return (
-    <Stack spacing={2.5}>
+    <Stack spacing={{ xs: 1.6, md: 2.5 }}>
       <Stack direction={{ xs: "column", md: "row" }} justifyContent="space-between" spacing={2}>
         <Box>
           <Chip
@@ -57,10 +57,10 @@ export function HistoryView({
             label="TRADE HISTORY"
             sx={{ mb: 1, bgcolor: "#f0efff", color: "#3035bf", fontWeight: 1000, letterSpacing: 1.8 }}
           />
-          <Typography variant="h4" sx={{ fontWeight: 1000, letterSpacing: "-0.04em" }}>
+          <Typography variant="h4" sx={{ fontWeight: 1000, letterSpacing: "-0.035em", fontSize: { xs: 22, md: 34 } }}>
             Recent activity
           </Typography>
-          <Typography color="text.secondary">Track chats, payouts, proofs, and completed receipts.</Typography>
+          <Typography color="text.secondary" sx={{ fontSize: { xs: 13.5, md: 16 } }}>Track chats, payouts, proofs, and completed receipts.</Typography>
         </Box>
         <Chip
           label={`${items.length} total trade${items.length === 1 ? "" : "s"}`}
@@ -70,11 +70,11 @@ export function HistoryView({
 
       {items.length === 0 && (
         <Card variant="outlined" sx={{ borderRadius: 5, borderColor: "rgba(87,87,246,0.14)", bgcolor: "#fbfcff" }}>
-          <CardContent sx={{ p: { xs: 3, md: 5 }, textAlign: "center" }}>
-            <Avatar sx={{ mx: "auto", mb: 2, width: 64, height: 64, bgcolor: "#f0efff", color: "#5757f6" }}>
+          <CardContent sx={{ p: { xs: 2.2, md: 5 }, textAlign: "center" }}>
+            <Avatar sx={{ mx: "auto", mb: 2, width: { xs: 52, md: 64 }, height: { xs: 52, md: 64 }, bgcolor: "#f0efff", color: "#5757f6" }}>
               <ReceiptLongIcon />
             </Avatar>
-            <Typography variant="h5" sx={{ fontWeight: 1000, letterSpacing: "-0.03em" }}>
+            <Typography variant="h5" sx={{ fontWeight: 1000, letterSpacing: "-0.03em", fontSize: { xs: 20, md: 24 } }}>
               No trades yet
             </Typography>
             <Typography color="text.secondary" sx={{ mt: 1 }}>
@@ -112,16 +112,16 @@ export function HistoryView({
               }
             }}
           >
-            <CardContent sx={{ p: { xs: 2.5, md: 3 } }}>
+            <CardContent sx={{ p: { xs: 1.5, md: 3 } }}>
               <Grid container spacing={2.2} alignItems="center">
                 <Grid item xs={12} lg={4}>
                   <Stack direction="row" spacing={1.6} alignItems="center">
-                    <Avatar sx={{ bgcolor: "#08133b", color: "#8fffb5", width: 58, height: 58, fontWeight: 1000, fontSize: 26 }}>
+                    <Avatar sx={{ bgcolor: "#08133b", color: "#8fffb5", width: { xs: 44, md: 58 }, height: { xs: 44, md: 58 }, fontWeight: 1000, fontSize: { xs: 20, md: 26 } }}>
                       {trade.coin.slice(0, 1)}
                     </Avatar>
                     <Box>
                       <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
-                        <Typography variant="h5" sx={{ fontWeight: 1000, letterSpacing: "-0.04em" }}>
+                        <Typography variant="h5" sx={{ fontWeight: 1000, letterSpacing: "-0.035em", fontSize: { xs: 18, md: 24 } }}>
                           {trade.coin} {usd(trade.amountUsd)}
                         </Typography>
                         <StatusChip status={trade.status} />

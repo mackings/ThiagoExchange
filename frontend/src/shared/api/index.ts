@@ -50,7 +50,8 @@ export type TradeMessage = {
   createdAt: string;
 };
 
-const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
+export const API_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:8080/api";
+export const API_HEALTH_URL = API_URL.replace(/\/api\/?$/, "/health");
 
 export function wsUrl(path: string, token: string) {
   const base = API_URL.replace(/^http/, "ws");

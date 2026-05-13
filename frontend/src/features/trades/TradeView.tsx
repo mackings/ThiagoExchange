@@ -9,6 +9,7 @@ import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
 import Checkbox from "@mui/material/Checkbox";
 import Chip from "@mui/material/Chip";
+import CircularProgress from "@mui/material/CircularProgress";
 import Dialog from "@mui/material/Dialog";
 import DialogActions from "@mui/material/DialogActions";
 import DialogContent from "@mui/material/DialogContent";
@@ -105,10 +106,10 @@ export function TradeView({
     <>
       <Stack spacing={{ xs: 2, md: 3 }}>
         <Box>
-          <Typography variant="h4" sx={{ fontWeight: 1000, mb: 0.8, letterSpacing: "-0.04em", fontSize: { xs: 26, md: 34 } }}>
+          <Typography variant="h4" sx={{ fontWeight: 1000, mb: 0.8, letterSpacing: "-0.035em", fontSize: { xs: 22, md: 30 } }}>
             Choose a live offer
           </Typography>
-          <Typography color="text.secondary" sx={{ fontSize: { xs: 14.5, md: 17 } }}>
+          <Typography color="text.secondary" sx={{ fontSize: { xs: 13.5, md: 16 } }}>
             Pick a desk offer, review the terms, then continue to the secured trade chat.
           </Typography>
         </Box>
@@ -133,15 +134,15 @@ export function TradeView({
                   }
                 }}
               >
-                <CardContent sx={{ p: { xs: 2, md: 3 } }}>
+                <CardContent sx={{ p: { xs: 1.5, md: 2.5 } }}>
                   <Stack spacing={{ xs: 1.6, md: 2.2 }}>
                     <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                       <Stack direction="row" spacing={1.4} alignItems="center">
-                        <Avatar sx={{ bgcolor: "#f0efff", color: "#5757f6", fontWeight: 1000, width: { xs: 44, md: 50 }, height: { xs: 44, md: 50 } }}>
+                        <Avatar sx={{ bgcolor: "#f0efff", color: "#5757f6", fontWeight: 1000, width: { xs: 38, md: 48 }, height: { xs: 38, md: 48 } }}>
                           {rate.coin.slice(0, 1)}
                         </Avatar>
                         <Box>
-                          <Typography variant="h6" sx={{ fontWeight: 1000 }}>
+                          <Typography variant="h6" sx={{ fontWeight: 1000, fontSize: { xs: 16, md: 20 } }}>
                             Sell {rate.coin}
                           </Typography>
                           <Typography variant="body2" color="text.secondary">
@@ -155,11 +156,11 @@ export function TradeView({
                       </Stack>
                     </Stack>
 
-                    <Box sx={{ p: { xs: 1.6, md: 2.2 }, borderRadius: { xs: 3, md: 4 }, bgcolor: "#f8f8ff", border: "1px solid rgba(87,87,246,0.12)" }}>
+                    <Box sx={{ p: { xs: 1.35, md: 2 }, borderRadius: { xs: 3, md: 4 }, bgcolor: "#f8f8ff", border: "1px solid rgba(87,87,246,0.12)" }}>
                       <Typography variant="body2" color="text.secondary">
                         Desk rate
                       </Typography>
-                      <Typography variant="h4" sx={{ fontWeight: 1000, letterSpacing: 0, fontSize: { xs: 28, md: 34 } }}>
+                      <Typography variant="h4" sx={{ fontWeight: 1000, letterSpacing: 0, fontSize: { xs: 24, md: 32 } }}>
                         {money(rate.buyRateNgn)}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
@@ -253,9 +254,20 @@ export function TradeView({
             disableElevation
             disabled={submitting || !accepted || !amount || belowMinimum}
             onClick={submit}
-            sx={{ py: 1.35, bgcolor: "#08133b", boxShadow: "none", "&:hover": { bgcolor: "#101b4a", boxShadow: "none" } }}
+            sx={{
+              py: 1.35,
+              bgcolor: "#08133b",
+              boxShadow: "none",
+              "&:hover": { bgcolor: "#101b4a", boxShadow: "none" },
+              "&.Mui-disabled": {
+                bgcolor: "#5757f6",
+                color: "#fff",
+                opacity: 0.85
+              }
+            }}
+            startIcon={submitting ? <CircularProgress size={18} color="inherit" /> : undefined}
           >
-            {submitting ? "Opening..." : "Open Trade Chat"}
+            {submitting ? "Opening trade..." : "Open Trade Chat"}
           </Button>
         </DialogActions>
       </Dialog>

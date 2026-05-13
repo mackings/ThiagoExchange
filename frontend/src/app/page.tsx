@@ -35,11 +35,12 @@ import { RateNotifier } from "@/features/notifications/RateNotifier";
 import { HistoryView } from "@/features/trades/HistoryView";
 import { TradeChat } from "@/features/trades/TradeChat";
 import { TradeView } from "@/features/trades/TradeView";
-import { Rate, Trade, api, money, usd } from "@/shared/api";
+import { API_HEALTH_URL, Rate, Trade, api, money, usd } from "@/shared/api";
 import { StatusChip } from "@/shared/ui/StatusChip";
 import { TradeTimer } from "@/shared/ui/TradeTimer";
 
 const sessionKey = "thiago.session";
+const keepAliveIntervalMs = 14 * 60 * 1000;
 
 export default function Home() {
   return <ExchangeApp />;
@@ -60,8 +61,8 @@ function ExchangeApp() {
   const safeRates = Array.isArray(rates) ? rates : [];
   const safeTrades = Array.isArray(trades) ? trades : [];
   const activeTrade = useMemo(() => safeTrades.find((trade) => trade.status === "pending") || null, [safeTrades]);
-  const activeTradeCount = safeTrades.filter((trade) => trade.status === "pending").length;
 
+  
   useEffect(() => {
     const saved = localStorage.getItem(sessionKey);
     if (saved) {
@@ -75,6 +76,23 @@ function ExchangeApp() {
   useEffect(() => {
     if (token) loadTrades(token);
   }, [token]);
+
+  useEffect(() => {
+    async function keepAlive() {
+      try {
+        await Promise.allSettled([
+          fetch(API_HEALTH_URL, { cache: "no-store" }),
+          fetch("/", { cache: "no-store" })
+        ]);
+        console.log("[keepalive] frontend and API pinged");
+      } catch (err) {
+        console.log("[keepalive] ping failed", err);
+      }
+    }
+
+    const id = window.setInterval(keepAlive, keepAliveIntervalMs);
+    return () => window.clearInterval(id);
+  }, []);
 
   async function loadRates() {
     try {
@@ -179,7 +197,7 @@ function ExchangeApp() {
                   sx={{
                     fontWeight: 1000,
                     maxWidth: 820,
-                    fontSize: { xs: 34, sm: 52, md: 92 },
+                    fontSize: { xs: 29, sm: 46, md: 78 },
                     lineHeight: { xs: 1, md: 0.94 },
                     letterSpacing: { xs: "-0.035em", md: "-0.055em" },
                     background: "linear-gradient(115deg, #2764ff 0%, #6657f6 45%, #d84bbf 92%)",
@@ -189,7 +207,7 @@ function ExchangeApp() {
                 >
                   Sell coins when the payout feels right.
                 </Typography>
-                <Typography sx={{ color: "#53627c", maxWidth: 690, fontSize: { xs: 14.5, md: 20 }, lineHeight: { xs: 1.55, md: 1.7 } }}>
+                <Typography sx={{ color: "#53627c", maxWidth: 690, fontSize: { xs: 13.5, md: 18 }, lineHeight: { xs: 1.5, md: 1.65 } }}>
                   Choose a live desk offer, accept the terms, release coin, upload proof, and chat with Thiago Desk until payment is complete.
                 </Typography>
                 <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
@@ -211,7 +229,7 @@ function ExchangeApp() {
                       <>
                         <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={2}>
                           <Box>
-                            <Typography variant="h4" sx={{ fontWeight: 1000, letterSpacing: "-0.04em" }}>
+                            <Typography variant="h4" sx={{ fontWeight: 1000, letterSpacing: "-0.04em", fontSize: { xs: 24, md: 34 } }}>
                               {activeTrade.coin} {usd(activeTrade.amountUsd)}
                             </Typography>
                             <Typography color="text.secondary" sx={{ mt: 0.5 }}>
@@ -265,23 +283,18 @@ function ExchangeApp() {
             onChange={(_, value) => setActiveTab(value)}
             variant="scrollable"
             allowScrollButtonsMobile
-            TabIndicatorProps={{ children: <span /> }}
             sx={{
-              minHeight: { xs: 58, md: 78 },
+              minHeight: { xs: 52, md: 68 },
               "& .MuiTabs-flexContainer": { gap: { xs: 0.6, md: 1 } },
               "& .MuiTabs-indicator": {
-                height: { xs: 3, md: 5 },
-                borderRadius: 999,
-                bgcolor: "#08133b",
-                display: "flex",
-                justifyContent: "center"
+                display: "none"
               },
               "& .MuiTabs-indicatorSpan": {
                 width: "70%",
                 bgcolor: "#08133b"
               },
               "& .MuiTab-root": {
-                minHeight: { xs: 52, md: 68 },
+                minHeight: { xs: 46, md: 58 },
                 px: { xs: 1.4, md: 3 },
                 borderRadius: 999,
                 fontWeight: 900,
@@ -300,22 +313,7 @@ function ExchangeApp() {
             <Tab
               icon={<WalletIcon />}
               iconPosition="start"
-              label={
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <span>Active Trade</span>
-                  <Chip
-                    size="small"
-                    label={activeTradeCount}
-                    sx={{
-                      height: 22,
-                      minWidth: 24,
-                      bgcolor: activeTradeCount ? "#5757f6" : "#dfe3ef",
-                      color: activeTradeCount ? "#fff" : "#66708a",
-                      fontWeight: 1000
-                    }}
-                  />
-                </Stack>
-              }
+              label="Active Trade"
             />
             <Tab icon={<HistoryIcon />} iconPosition="start" label="History" />
           </Tabs>

@@ -30,6 +30,8 @@ services:
         value: Thiago Exchange
       - key: FRONTEND_URL
         value: https://thiagoxchange-web.onrender.com
+      - key: BACKEND_URL
+        value: https://thiagoxchange-api.onrender.com
 
   - type: web
     name: thiagoxchange-web

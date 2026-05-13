@@ -4,6 +4,8 @@ import (
 	"context"
 	"log"
 	"net/http"
+	"strings"
+	"time"
 
 	"thiagoxchange/backend/internal/config"
 	"thiagoxchange/backend/internal/features/auth"
@@ -75,6 +77,47 @@ func main() {
 		Handler: httpx.CORS(mux),
 	}
 
+	startKeepAlive(cfg)
+
 	log.Printf("%s API listening on :%s", cfg.AppName, cfg.Port)
 	log.Fatal(server.ListenAndServe())
+}
+
+func startKeepAlive(cfg config.Config) {
+	targets := []string{}
+	if cfg.BackendURL != "" {
+		targets = append(targets, strings.TrimRight(cfg.BackendURL, "/")+"/health")
+	}
+	if strings.HasPrefix(cfg.FrontendURL, "https://") {
+		targets = append(targets, strings.TrimRight(cfg.FrontendURL, "/"))
+	}
+	if len(targets) == 0 {
+		return
+	}
+
+	client := &http.Client{Timeout: 20 * time.Second}
+	ping := func() {
+		for _, target := range targets {
+			resp, err := client.Get(target)
+			if err != nil {
+				log.Printf("keepalive ping failed for %s: %v", target, err)
+				continue
+			}
+			_ = resp.Body.Close()
+			log.Printf("keepalive ping %s -> %s", target, resp.Status)
+		}
+	}
+
+	go func() {
+		timer := time.NewTimer(time.Minute)
+		defer timer.Stop()
+		<-timer.C
+		ping()
+
+		ticker := time.NewTicker(14 * time.Minute)
+		defer ticker.Stop()
+		for range ticker.C {
+			ping()
+		}
+	}()
 }

@@ -20,6 +20,7 @@ type Config struct {
 	SMTPPass    string
 	SMTPFrom    string
 	FrontendURL string
+	BackendURL  string
 }
 
 func Load() Config {
@@ -45,6 +46,7 @@ func Load() Config {
 		SMTPPass:    os.Getenv("SMTP_PASS"),
 		SMTPFrom:    env("SMTP_FROM_NAME", "Thiago Exchange"),
 		FrontendURL: env("FRONTEND_URL", "http://localhost:3000"),
+		BackendURL:  env("BACKEND_URL", os.Getenv("RENDER_EXTERNAL_URL")),
 	}
 }
 

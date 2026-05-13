@@ -158,7 +158,7 @@ export function TradeChat({
       variant="outlined"
       sx={{
         overflow: "hidden",
-        borderRadius: 6,
+        borderRadius: { xs: 4, md: 6 },
         background: "#fff",
         borderColor: "rgba(87,87,246,0.14)",
         boxShadow: "0 16px 48px rgba(8,19,59,0.08)"
@@ -166,7 +166,7 @@ export function TradeChat({
     >
       <Box
         sx={{
-          p: { xs: 2.5, md: 3 },
+          p: { xs: 1.6, md: 3 },
           color: "#08133b",
           background: "linear-gradient(135deg, rgba(246,248,255,0.96), rgba(255,247,253,0.96))",
           borderBottom: "1px solid rgba(87,87,246,0.12)"
@@ -175,11 +175,11 @@ export function TradeChat({
         <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" spacing={2}>
           <Stack spacing={1}>
             <Stack direction="row" spacing={1} alignItems="center">
-              <Avatar sx={{ bgcolor: "#5757f6", color: "#fff", fontWeight: 1000, width: 52, height: 52 }}>
+              <Avatar sx={{ bgcolor: "#5757f6", color: "#fff", fontWeight: 1000, width: { xs: 42, md: 52 }, height: { xs: 42, md: 52 } }}>
                 {trade.coin.slice(0, 1)}
               </Avatar>
               <Box>
-                <Typography variant={compact ? "subtitle1" : "h6"} sx={{ fontWeight: 1000 }}>
+                <Typography variant={compact ? "subtitle1" : "h6"} sx={{ fontWeight: 1000, fontSize: { xs: 16, md: compact ? 16 : 20 } }}>
                   {trade.coin} trade thread
                 </Typography>
                 <Typography variant="body2" color="text.secondary">
@@ -203,7 +203,7 @@ export function TradeChat({
         </Stack>
       </Box>
 
-      <Stack spacing={2.3} sx={{ p: { xs: 2, md: 3 } }}>
+      <Stack spacing={{ xs: 1.5, md: 2.3 }} sx={{ p: { xs: 1.25, md: 3 } }}>
         <Alert severity="info" icon={<WalletIcon />} sx={{ borderRadius: 4, bgcolor: "#f7f8ff", color: "#08133b", border: "1px solid rgba(87,87,246,0.12)" }}>
           Send coin to <strong>{trade.walletAddress}</strong>
           <Tooltip title="Copy wallet">
@@ -213,7 +213,7 @@ export function TradeChat({
           </Tooltip>
         </Alert>
 
-        <Stack spacing={1.5} sx={{ maxHeight: compact ? 320 : 460, overflowY: "auto", pr: 0.5, p: { xs: 0, md: 1 }, bgcolor: "#fbfcff", borderRadius: 5, border: "1px solid rgba(87,87,246,0.08)" }}>
+        <Stack spacing={1.2} sx={{ maxHeight: compact ? 320 : { xs: 380, md: 460 }, overflowY: "auto", pr: 0.5, p: { xs: 0, md: 1 }, bgcolor: "#fbfcff", borderRadius: { xs: 4, md: 5 }, border: "1px solid rgba(87,87,246,0.08)" }}>
           {messages.map((item) => {
             const mine = item.sender === "user";
             return (
@@ -221,8 +221,8 @@ export function TradeChat({
                 <Box
                   sx={{
                     maxWidth: { xs: "90%", md: "74%" },
-                    px: 1.8,
-                    py: 1.35,
+                    px: { xs: 1.35, md: 1.8 },
+                    py: { xs: 1, md: 1.35 },
                     borderRadius: mine ? "24px 24px 6px 24px" : "24px 24px 24px 6px",
                     bgcolor: mine ? "#5757f6" : item.sender === "admin" ? "#08133b" : "#fff",
                     color: mine || item.sender === "admin" ? "#fff" : "text.primary",
@@ -238,7 +238,7 @@ export function TradeChat({
                       {formatMessageTime(item.createdAt)}
                     </Typography>
                   </Stack>
-                  <Typography sx={{ whiteSpace: "pre-wrap" }}>{item.body}</Typography>
+                  <Typography sx={{ whiteSpace: "pre-wrap", fontSize: { xs: 13.5, md: 16 } }}>{item.body}</Typography>
                   {item.attachmentUrl && (
                     <Box
                       component="img"
