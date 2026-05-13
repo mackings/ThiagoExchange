@@ -161,25 +161,27 @@ function ExchangeApp() {
         >
           <Image src="/thiago-logo.svg" alt="Thiago Exchange" width={150} height={40} priority />
           <Box sx={{ flexGrow: 1 }} />
-          <Stack direction="row" spacing={0.5} sx={{ display: { xs: "none", md: "flex" }, p: 0.5, borderRadius: 999, bgcolor: "#f3f4ff" }}>
-            {["Offers", "History"].map((item, index) => (
-              <Button
-                key={item}
-                onClick={() => {
-                  setActiveTab(index);
-                }}
-                sx={{
-                  px: 2.3,
-                  color: activeTab === index ? "#08133b" : "#60708c",
-                  bgcolor: activeTab === index ? "#fff" : "transparent",
-                  boxShadow: activeTab === index ? "0 8px 20px rgba(8,19,59,0.06)" : "none",
-                  "&:hover": { bgcolor: "#fff" }
-                }}
-              >
-                {item}
-              </Button>
-            ))}
-            <Button href="/giftcards" startIcon={<CardGiftcardIcon />} sx={{ px: 2.3, color: "#1d4ed8", bgcolor: "#eaf2ff", "&:hover": { bgcolor: "#dbeafe" } }}>
+          <Stack direction="row" spacing={1.5} alignItems="center" sx={{ display: { xs: "none", md: "flex" } }}>
+            <Stack direction="row" spacing={0.5} sx={{ p: 0.5, borderRadius: 999, bgcolor: "#f3f4ff" }}>
+              {["Offers", "History"].map((item, index) => (
+                <Button
+                  key={item}
+                  onClick={() => {
+                    setActiveTab(index);
+                  }}
+                  sx={{
+                    px: 2.3,
+                    color: activeTab === index ? "#08133b" : "#60708c",
+                    bgcolor: activeTab === index ? "#fff" : "transparent",
+                    boxShadow: activeTab === index ? "0 8px 20px rgba(8,19,59,0.06)" : "none",
+                    "&:hover": { bgcolor: "#fff" }
+                  }}
+                >
+                  {item}
+                </Button>
+              ))}
+            </Stack>
+            <Button href="/giftcards" startIcon={<CardGiftcardIcon />} sx={{ px: 2.3, color: "#1d4ed8", bgcolor: "#eaf2ff", border: "1px solid rgba(47,109,246,0.14)", "&:hover": { bgcolor: "#dbeafe" } }}>
               Gift Cards
             </Button>
           </Stack>
@@ -371,7 +373,7 @@ function ExchangeApp() {
               <Tab icon={<WalletIcon />} iconPosition="start" label="Offers" />
               <Tab icon={<HistoryIcon />} iconPosition="start" label="History" />
             </Tabs>
-            <Box sx={{ display: { xs: "block", md: "none" }, px: 0.4, pb: 0.8 }}>
+            <Box sx={{ display: { xs: "block", md: "none" }, px: 0.4, pt: 1.4, pb: 0.9, mt: 0.5, borderTop: "1px solid rgba(87,87,246,0.10)" }}>
               <Button href="/giftcards" fullWidth startIcon={<CardGiftcardIcon />} sx={{ borderRadius: 999, bgcolor: "#eaf2ff", color: "#1d4ed8", fontWeight: 900 }}>
                 Sell gift cards
               </Button>
