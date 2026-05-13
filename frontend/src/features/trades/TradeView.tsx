@@ -233,76 +233,83 @@ export function TradeView({
         </Typography>
       </Box>
 
-      <Grid container spacing={{ xs: 1.5, md: 2.5 }}>
+      <Box
+        sx={{
+          display: "grid",
+          gridTemplateColumns: { xs: "1fr", md: "repeat(2, minmax(0, 1fr))", lg: "repeat(3, minmax(0, 1fr))" },
+          gap: { xs: 1.5, md: 2.5 },
+          width: "100%"
+        }}
+      >
         {sortedRates.map((rate) => (
-          <Grid item xs={12} md={6} lg={4} key={rate.id}>
-            <Card
-              variant="outlined"
-              sx={{
-                height: "100%",
-                borderRadius: { xs: 4, md: 5 },
-                borderColor: "rgba(87,87,246,0.14)",
-                background: "linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,255,0.96))",
-                boxShadow: "0 12px 34px rgba(8,19,59,0.06)",
-                transition: "transform .18s ease, box-shadow .18s ease, border-color .18s ease",
-                "&:hover": {
-                  transform: "translateY(-4px)",
-                  borderColor: "#9d9cff",
-                  boxShadow: "0 18px 46px rgba(87,87,246,0.12)"
-                }
-              }}
-            >
-              <CardContent sx={{ p: { xs: 1.5, md: 2.5 } }}>
-                <Stack spacing={{ xs: 1.6, md: 2.2 }}>
-                  <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
-                    <Stack direction="row" spacing={1.4} alignItems="center">
-                      <CoinIcon coin={rate.coin} size={48} />
-                      <Box>
-                        <Typography variant="h6" sx={{ fontWeight: 1000, fontSize: { xs: 16, md: 20 } }}>
-                          Sell
-                        </Typography>
-                        <Typography variant="body2" color="text.secondary">
-                          {rate.network}
-                        </Typography>
-                      </Box>
-                    </Stack>
-                    <Stack spacing={0.8} alignItems="flex-end">
-                      <Chip size="small" icon={<BoltIcon />} label={responseTime(rate)} sx={{ bgcolor: "#f0efff", color: "#3035bf", fontWeight: 900 }} />
-                      <Chip size="small" label={`${successfulCount(rate)} successful`} sx={{ bgcolor: "#eafff2", color: "#0f7a40", fontWeight: 1000 }} />
-                    </Stack>
+          <Card
+            key={rate.id}
+            variant="outlined"
+            sx={{
+              height: "100%",
+              minWidth: 0,
+              borderRadius: { xs: 4, md: 5 },
+              borderColor: "rgba(87,87,246,0.14)",
+              background: "linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,255,0.96))",
+              boxShadow: "0 12px 34px rgba(8,19,59,0.06)",
+              transition: "transform .18s ease, box-shadow .18s ease, border-color .18s ease",
+              "&:hover": {
+                transform: "translateY(-4px)",
+                borderColor: "#9d9cff",
+                boxShadow: "0 18px 46px rgba(87,87,246,0.12)"
+              }
+            }}
+          >
+            <CardContent sx={{ p: { xs: 1.5, md: 2.5 } }}>
+              <Stack spacing={{ xs: 1.6, md: 2.2 }}>
+                <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
+                  <Stack direction="row" spacing={1.4} alignItems="center">
+                    <CoinIcon coin={rate.coin} size={48} />
+                    <Box>
+                      <Typography variant="h6" sx={{ fontWeight: 1000, fontSize: { xs: 16, md: 20 } }}>
+                        Sell
+                      </Typography>
+                      <Typography variant="body2" color="text.secondary">
+                        {rate.network}
+                      </Typography>
+                    </Box>
                   </Stack>
-
-                  <Box sx={{ p: { xs: 1.35, md: 2 }, borderRadius: { xs: 3, md: 4 }, bgcolor: "#f8f8ff", border: "1px solid rgba(87,87,246,0.12)" }}>
-                    <Typography variant="body2" color="text.secondary">
-                      Desk rate
-                    </Typography>
-                    <Typography variant="h4" sx={{ fontWeight: 1000, letterSpacing: 0, fontSize: { xs: 24, md: 32 } }}>
-                      {money(rate.buyRateNgn)}
-                    </Typography>
-                    <Typography variant="caption" color="text.secondary">
-                      per $1, minimum {usd(rate.minAmountUsd)}
-                    </Typography>
-                  </Box>
-
-                  <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
-                    <Chip size="small" icon={<GppGoodIcon />} label="30 min escrow window" />
-                    <Chip size="small" icon={<ReceiptLongIcon />} label={`${responseTime(rate)} response`} />
+                  <Stack spacing={0.8} alignItems="flex-end">
+                    <Chip size="small" icon={<BoltIcon />} label={responseTime(rate)} sx={{ bgcolor: "#f0efff", color: "#3035bf", fontWeight: 900 }} />
+                    <Chip size="small" label={`${successfulCount(rate)} successful`} sx={{ bgcolor: "#eafff2", color: "#0f7a40", fontWeight: 1000 }} />
                   </Stack>
-
-                  <Button
-                    variant="contained"
-                    endIcon={<ArrowForwardIcon />}
-                    onClick={() => viewOffer(rate)}
-                    sx={{ py: 1.25, bgcolor: "#5757f6", boxShadow: "0 8px 20px rgba(87,87,246,0.18)" }}
-                  >
-                    View Offer
-                  </Button>
                 </Stack>
-              </CardContent>
-            </Card>
-          </Grid>
+
+                <Box sx={{ p: { xs: 1.35, md: 2 }, borderRadius: { xs: 3, md: 4 }, bgcolor: "#f8f8ff", border: "1px solid rgba(87,87,246,0.12)" }}>
+                  <Typography variant="body2" color="text.secondary">
+                    Desk rate
+                  </Typography>
+                  <Typography variant="h4" sx={{ fontWeight: 1000, letterSpacing: 0, fontSize: { xs: 24, md: 32 } }}>
+                    {money(rate.buyRateNgn)}
+                  </Typography>
+                  <Typography variant="caption" color="text.secondary">
+                    per $1, minimum {usd(rate.minAmountUsd)}
+                  </Typography>
+                </Box>
+
+                <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+                  <Chip size="small" icon={<GppGoodIcon />} label="30 min escrow window" />
+                  <Chip size="small" icon={<ReceiptLongIcon />} label={`${responseTime(rate)} response`} />
+                </Stack>
+
+                <Button
+                  variant="contained"
+                  endIcon={<ArrowForwardIcon />}
+                  onClick={() => viewOffer(rate)}
+                  sx={{ py: 1.25, bgcolor: "#5757f6", boxShadow: "0 8px 20px rgba(87,87,246,0.18)" }}
+                >
+                  View Offer
+                </Button>
+              </Stack>
+            </CardContent>
+          </Card>
         ))}
-      </Grid>
+      </Box>
     </Stack>
   );
 }
