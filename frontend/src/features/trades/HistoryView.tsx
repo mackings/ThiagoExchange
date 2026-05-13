@@ -1,6 +1,5 @@
 "use client";
 
-import { useState } from "react";
 import Alert from "@mui/material/Alert";
 import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
@@ -24,7 +23,6 @@ import { money, usd } from "@/shared/api";
 import { StatusChip } from "@/shared/ui/StatusChip";
 import { TradeTimer } from "@/shared/ui/TradeTimer";
 import { CoinIcon } from "@/shared/ui/CoinIcon";
-import { TradeChat } from "./TradeChat";
 
 export function HistoryView({
   trades,
@@ -37,7 +35,6 @@ export function HistoryView({
   onRefresh: () => void;
   onError: (message: string) => void;
 }) {
-  const [expandedTradeId, setExpandedTradeId] = useState("");
   const items = Array.isArray(trades) ? trades : [];
 
   if (!token) {
@@ -85,18 +82,7 @@ export function HistoryView({
         </Card>
       )}
 
-      {items.map((trade) =>
-        expandedTradeId === trade.id ? (
-          <TradeChat
-            key={trade.id}
-            trade={trade}
-            token={token}
-            compact
-            onTrade={() => onRefresh()}
-            onRefresh={onRefresh}
-            onError={onError}
-          />
-        ) : (
+      {items.map((trade) => (
           <Card
             key={trade.id}
             variant="outlined"
@@ -167,16 +153,15 @@ export function HistoryView({
                       <Chip label={trade.transactionHash ? "Proof sent" : "Proof pending"} sx={{ bgcolor: trade.transactionHash ? "#eafff2" : "#fff6e5", color: trade.transactionHash ? "#0f7a40" : "#9a5b00", fontWeight: 900 }} />
                     </Stack>
                     {trade.status === "pending" && <TradeTimer trade={trade} onExpired={onRefresh} />}
-                    <Button variant="contained" endIcon={<ArrowForwardIcon />} onClick={() => setExpandedTradeId(trade.id)} sx={{ bgcolor: "#5757f6" }}>
-                      Open Chat
+                    <Button variant="contained" endIcon={<ArrowForwardIcon />} href={`/trades/${trade.id}`} sx={{ bgcolor: "#5757f6" }}>
+                      Open Trade Page
                     </Button>
                   </Stack>
                 </Grid>
               </Grid>
             </CardContent>
           </Card>
-        )
-      )}
+      ))}
     </Stack>
   );
 }
