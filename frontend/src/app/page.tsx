@@ -22,7 +22,6 @@ import {
   Tooltip,
   Typography
 } from "@mui/material";
-import AdminPanelSettingsIcon from "@mui/icons-material/AdminPanelSettings";
 import HistoryIcon from "@mui/icons-material/History";
 import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -31,7 +30,6 @@ import SecurityIcon from "@mui/icons-material/Security";
 import TimerIcon from "@mui/icons-material/Timer";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import WalletIcon from "@mui/icons-material/Wallet";
-import { AdminView } from "@/features/admin/AdminView";
 import { AuthDialog, AuthMode, Session } from "@/features/auth/AuthDialog";
 import { RateNotifier } from "@/features/notifications/RateNotifier";
 import { HistoryView } from "@/features/trades/HistoryView";
@@ -112,34 +110,34 @@ function ExchangeApp() {
   }
 
   return (
-    <Box sx={{ minHeight: "100vh", bgcolor: "transparent", px: { xs: 1, md: 2 }, py: { xs: 1, md: 2 } }}>
+    <Box sx={{ minHeight: "100vh", bgcolor: "transparent", px: { xs: 0.75, md: 2 }, py: { xs: 0.75, md: 2 } }}>
       <AppBar position="sticky" elevation={0} sx={{ bgcolor: "transparent", color: "text.primary", boxShadow: "none" }}>
         <Toolbar
           sx={{
-            gap: 2,
+            gap: { xs: 1, md: 2 },
             mx: { xs: 0, md: 2 },
             mt: { xs: 0, md: 1 },
-            px: { xs: 2, md: 3 },
-            py: { xs: 1.2, md: 1.6 },
-            minHeight: { xs: 76, md: 92 },
-            borderRadius: { xs: 4, md: 999 },
+            px: { xs: 1.4, md: 3 },
+            py: { xs: 0.8, md: 1.6 },
+            minHeight: { xs: 64, md: 92 },
+            borderRadius: { xs: 3.5, md: 999 },
             bgcolor: "rgba(255,255,255,0.84)",
             border: "1px solid rgba(87,87,246,0.14)",
             boxShadow: "0 14px 38px rgba(8,19,59,0.08)"
           }}
         >
-          <Image src="/thiago-logo.svg" alt="Thiago Exchange" width={180} height={48} priority />
+          <Image src="/thiago-logo.svg" alt="Thiago Exchange" width={150} height={40} priority />
           <Box sx={{ flexGrow: 1 }} />
           <Stack direction="row" spacing={0.5} sx={{ display: { xs: "none", md: "flex" }, p: 0.5, borderRadius: 999, bgcolor: "#f3f4ff" }}>
-            {["Home", "Active Trade", "History"].map((item, index) => (
+            {["Trade", "History"].map((item, index) => (
               <Button
                 key={item}
-                onClick={() => setActiveTab(index === 0 ? 0 : index - 1)}
+                onClick={() => setActiveTab(index)}
                 sx={{
                   px: 2.3,
-                  color: index === 0 ? "#08133b" : "#60708c",
-                  bgcolor: index === 0 ? "#fff" : "transparent",
-                  boxShadow: index === 0 ? "0 8px 20px rgba(8,19,59,0.06)" : "none",
+                  color: activeTab === index ? "#08133b" : "#60708c",
+                  bgcolor: activeTab === index ? "#fff" : "transparent",
+                  boxShadow: activeTab === index ? "0 8px 20px rgba(8,19,59,0.06)" : "none",
                   "&:hover": { bgcolor: "#fff" }
                 }}
               >
@@ -149,7 +147,6 @@ function ExchangeApp() {
           </Stack>
           {user ? (
             <Stack direction="row" spacing={1} alignItems="center">
-              {user.role === "admin" && <Chip size="small" color="secondary" icon={<AdminPanelSettingsIcon />} label="Admin" />}
               <Avatar sx={{ width: 34, height: 34, bgcolor: "primary.main", fontWeight: 900 }}>{user.name.charAt(0).toUpperCase()}</Avatar>
               <Tooltip title="Sign out">
                 <IconButton onClick={logout} color="primary" aria-label="sign out"><LogoutIcon /></IconButton>
@@ -164,27 +161,27 @@ function ExchangeApp() {
       <Box
         sx={{
           color: "#08133b",
-          pt: { xs: 4, md: 7 },
-          pb: { xs: 5, md: 8 },
+          pt: { xs: 2.4, md: 7 },
+          pb: { xs: 3, md: 8 },
           position: "relative",
           overflow: "hidden",
           background: "transparent"
         }}
       >
         <Container maxWidth="xl">
-          <Grid container spacing={{ xs: 4, md: 6 }} alignItems="center">
+          <Grid container spacing={{ xs: 2.4, md: 6 }} alignItems="center">
             <Grid item xs={12} md={7}>
-              <Stack spacing={2.4}>
-                <Chip sx={{ alignSelf: "flex-start", bgcolor: "rgba(87,87,246,0.10)", color: "#2331a6", fontWeight: 900, letterSpacing: 3 }} icon={<SecurityIcon />} label="VERIFIED P2P CRYPTO DESK" />
+              <Stack spacing={{ xs: 1.6, md: 2.4 }}>
+                <Chip size="small" sx={{ alignSelf: "flex-start", bgcolor: "rgba(87,87,246,0.10)", color: "#2331a6", fontWeight: 900, letterSpacing: { xs: 1.4, md: 3 } }} icon={<SecurityIcon />} label="VERIFIED P2P CRYPTO DESK" />
                 <Typography
                   variant="h3"
                   component="h1"
                   sx={{
                     fontWeight: 1000,
                     maxWidth: 820,
-                    fontSize: { xs: 44, sm: 64, md: 92 },
-                    lineHeight: 0.94,
-                    letterSpacing: "-0.055em",
+                    fontSize: { xs: 34, sm: 52, md: 92 },
+                    lineHeight: { xs: 1, md: 0.94 },
+                    letterSpacing: { xs: "-0.035em", md: "-0.055em" },
                     background: "linear-gradient(115deg, #2764ff 0%, #6657f6 45%, #d84bbf 92%)",
                     WebkitBackgroundClip: "text",
                     WebkitTextFillColor: "transparent"
@@ -192,20 +189,20 @@ function ExchangeApp() {
                 >
                   Sell coins when the payout feels right.
                 </Typography>
-                <Typography sx={{ color: "#53627c", maxWidth: 690, fontSize: { xs: 16, md: 20 }, lineHeight: 1.7 }}>
-                  Choose a live admin offer, accept the terms, release coin, upload proof, and chat with Thiago Desk until payment is complete.
+                <Typography sx={{ color: "#53627c", maxWidth: 690, fontSize: { xs: 14.5, md: 20 }, lineHeight: { xs: 1.55, md: 1.7 } }}>
+                  Choose a live desk offer, accept the terms, release coin, upload proof, and chat with Thiago Desk until payment is complete.
                 </Typography>
                 <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5}>
-                  <Button size="large" variant="contained" startIcon={<PaidIcon />} onClick={() => (user ? setActiveTab(0) : setAuthOpen(true))} sx={{ px: 4, py: 1.4, bgcolor: "#5757f6", boxShadow: "0 10px 24px rgba(87,87,246,0.22)" }}>Open live offer</Button>
-                  <Button size="large" variant="outlined" startIcon={<TrendingUpIcon />} sx={{ px: 3.5, py: 1.4, color: "#08133b", borderColor: "rgba(87,87,246,0.22)", bgcolor: "rgba(255,255,255,0.55)" }} onClick={() => setActiveTab(0)}>Browse rates</Button>
+                  <Button size="large" variant="contained" startIcon={<PaidIcon />} onClick={() => (user ? setActiveTab(0) : setAuthOpen(true))} sx={{ px: { xs: 2.5, md: 4 }, py: { xs: 1.15, md: 1.4 }, bgcolor: "#5757f6", boxShadow: "0 10px 24px rgba(87,87,246,0.22)" }}>Open live offer</Button>
+                  <Button size="large" variant="outlined" startIcon={<TrendingUpIcon />} sx={{ px: { xs: 2.5, md: 3.5 }, py: { xs: 1.15, md: 1.4 }, color: "#08133b", borderColor: "rgba(87,87,246,0.22)", bgcolor: "rgba(255,255,255,0.55)" }} onClick={() => setActiveTab(0)}>Browse rates</Button>
                 </Stack>
                 <RateNotifier rates={safeRates} />
               </Stack>
             </Grid>
             <Grid item xs={12} md={5}>
-              <Card sx={{ bgcolor: "#fff", color: "text.primary", border: "1px solid rgba(87,87,246,0.14)", borderRadius: 6, boxShadow: "0 18px 48px rgba(8,19,59,0.09)" }}>
-                <CardContent sx={{ p: { xs: 3, md: 4 } }}>
-                  <Stack spacing={2.5}>
+              <Card sx={{ bgcolor: "#fff", color: "text.primary", border: "1px solid rgba(87,87,246,0.14)", borderRadius: { xs: 4, md: 6 }, boxShadow: "0 18px 48px rgba(8,19,59,0.09)" }}>
+                <CardContent sx={{ p: { xs: 2, md: 4 } }}>
+                  <Stack spacing={{ xs: 1.7, md: 2.5 }}>
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
                       <Chip size="small" label="LIVE TRADE STATUS" sx={{ letterSpacing: 2.2, fontWeight: 1000, color: "#2331a6", bgcolor: "#f0efff" }} />
                       <TimerIcon sx={{ color: "#5757f6" }} />
@@ -245,7 +242,7 @@ function ExchangeApp() {
                       </>
                     ) : (
                       <>
-                        <Typography variant="h4" sx={{ fontWeight: 1000, letterSpacing: "-0.04em" }}>No open trade</Typography>
+                        <Typography variant="h4" sx={{ fontWeight: 1000, letterSpacing: "-0.04em", fontSize: { xs: 26, md: 34 } }}>No open trade</Typography>
                         <Typography color="text.secondary">Choose an offer to start a 30-minute secured chat.</Typography>
                         <Button variant="outlined" onClick={() => setActiveTab(0)} sx={{ alignSelf: "flex-start" }}>
                           Choose Offer
@@ -260,9 +257,9 @@ function ExchangeApp() {
         </Container>
       </Box>
 
-      <Container maxWidth="xl" sx={{ mt: { xs: 0, md: -2 }, pb: 6 }}>
-        <Paper sx={{ borderRadius: 6, overflow: "hidden", bgcolor: "#fff", border: "1px solid rgba(87,87,246,0.14)", boxShadow: "0 16px 46px rgba(8,19,59,0.08)" }}>
-          <Box sx={{ px: { xs: 1.2, md: 2 }, pt: { xs: 1.2, md: 1.5 }, borderBottom: "1px solid rgba(87,87,246,0.12)" }}>
+      <Container maxWidth="xl" sx={{ mt: { xs: 0, md: -2 }, pb: { xs: 3, md: 6 } }}>
+        <Paper sx={{ borderRadius: { xs: 4, md: 6 }, overflow: "hidden", bgcolor: "#fff", border: "1px solid rgba(87,87,246,0.14)", boxShadow: "0 16px 46px rgba(8,19,59,0.08)" }}>
+          <Box sx={{ px: { xs: 0.8, md: 2 }, pt: { xs: 0.8, md: 1.5 }, borderBottom: "1px solid rgba(87,87,246,0.12)" }}>
           <Tabs
             value={activeTab}
             onChange={(_, value) => setActiveTab(value)}
@@ -270,10 +267,10 @@ function ExchangeApp() {
             allowScrollButtonsMobile
             TabIndicatorProps={{ children: <span /> }}
             sx={{
-              minHeight: 78,
+              minHeight: { xs: 58, md: 78 },
               "& .MuiTabs-flexContainer": { gap: { xs: 0.6, md: 1 } },
               "& .MuiTabs-indicator": {
-                height: 5,
+                height: { xs: 3, md: 5 },
                 borderRadius: 999,
                 bgcolor: "#08133b",
                 display: "flex",
@@ -284,11 +281,11 @@ function ExchangeApp() {
                 bgcolor: "#08133b"
               },
               "& .MuiTab-root": {
-                minHeight: 68,
-                px: { xs: 2, md: 3 },
+                minHeight: { xs: 52, md: 68 },
+                px: { xs: 1.4, md: 3 },
                 borderRadius: 999,
                 fontWeight: 900,
-                fontSize: { xs: 14, sm: 16 },
+                fontSize: { xs: 13, sm: 16 },
                 color: "#66708a",
                 border: "1px solid transparent",
                 transition: "background-color .18s ease, color .18s ease, border-color .18s ease"
@@ -321,11 +318,10 @@ function ExchangeApp() {
               }
             />
             <Tab icon={<HistoryIcon />} iconPosition="start" label="History" />
-            {user?.role === "admin" && <Tab icon={<AdminPanelSettingsIcon />} iconPosition="start" label="Admin" />}
           </Tabs>
           </Box>
 
-          <Box sx={{ p: { xs: 2, md: 3 } }}>
+          <Box sx={{ p: { xs: 1.25, md: 3 } }}>
             {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError("")}>{error}</Alert>}
             {success && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess("")}>{success}</Alert>}
             {activeTab === 0 && activeTrade && token ? (
@@ -340,7 +336,6 @@ function ExchangeApp() {
               <TradeView rates={safeRates} trades={safeTrades} token={token} onRequireAuth={() => setAuthOpen(true)} onCreated={(trade) => { setTrades((items) => [trade, ...(Array.isArray(items) ? items : [])]); setSuccess("Trade opened. Chat thread started."); setActiveTab(0); window.setTimeout(() => loadTrades(), 250); }} onError={setError} />
             )}
             {activeTab === 1 && <HistoryView trades={safeTrades} token={token} onRefresh={() => loadTrades()} onError={setError} />}
-            {activeTab === 2 && user?.role === "admin" && <AdminView token={token!} rates={safeRates} onRates={setRates} onError={setError} onSuccess={setSuccess} />}
           </Box>
         </Paper>
       </Container>

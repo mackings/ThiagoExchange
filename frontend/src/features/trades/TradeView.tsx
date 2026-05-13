@@ -103,24 +103,24 @@ export function TradeView({
 
   return (
     <>
-      <Stack spacing={3}>
+      <Stack spacing={{ xs: 2, md: 3 }}>
         <Box>
-          <Typography variant="h4" sx={{ fontWeight: 1000, mb: 0.8, letterSpacing: "-0.04em" }}>
+          <Typography variant="h4" sx={{ fontWeight: 1000, mb: 0.8, letterSpacing: "-0.04em", fontSize: { xs: 26, md: 34 } }}>
             Choose a live offer
           </Typography>
-          <Typography color="text.secondary" sx={{ fontSize: 17 }}>
-            Pick an admin offer, review the terms, then continue to the secured trade chat.
+          <Typography color="text.secondary" sx={{ fontSize: { xs: 14.5, md: 17 } }}>
+            Pick a desk offer, review the terms, then continue to the secured trade chat.
           </Typography>
         </Box>
 
-        <Grid container spacing={2.5}>
+        <Grid container spacing={{ xs: 1.5, md: 2.5 }}>
           {rates.map((rate) => (
             <Grid item xs={12} md={6} lg={4} key={rate.id}>
               <Card
                 variant="outlined"
                 sx={{
                   height: "100%",
-                  borderRadius: 5,
+                  borderRadius: { xs: 4, md: 5 },
                   borderColor: "rgba(87,87,246,0.14)",
                   background:
                     "linear-gradient(180deg, rgba(255,255,255,0.98), rgba(250,250,255,0.96))",
@@ -133,11 +133,11 @@ export function TradeView({
                   }
                 }}
               >
-                <CardContent sx={{ p: 3 }}>
-                  <Stack spacing={2.2}>
+                <CardContent sx={{ p: { xs: 2, md: 3 } }}>
+                  <Stack spacing={{ xs: 1.6, md: 2.2 }}>
                     <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                       <Stack direction="row" spacing={1.4} alignItems="center">
-                        <Avatar sx={{ bgcolor: "#f0efff", color: "#5757f6", fontWeight: 1000, width: 50, height: 50 }}>
+                        <Avatar sx={{ bgcolor: "#f0efff", color: "#5757f6", fontWeight: 1000, width: { xs: 44, md: 50 }, height: { xs: 44, md: 50 } }}>
                           {rate.coin.slice(0, 1)}
                         </Avatar>
                         <Box>
@@ -155,11 +155,11 @@ export function TradeView({
                       </Stack>
                     </Stack>
 
-                    <Box sx={{ p: 2.2, borderRadius: 4, bgcolor: "#f8f8ff", border: "1px solid rgba(87,87,246,0.12)" }}>
+                    <Box sx={{ p: { xs: 1.6, md: 2.2 }, borderRadius: { xs: 3, md: 4 }, bgcolor: "#f8f8ff", border: "1px solid rgba(87,87,246,0.12)" }}>
                       <Typography variant="body2" color="text.secondary">
-                        Admin rate
+                        Desk rate
                       </Typography>
-                      <Typography variant="h4" sx={{ fontWeight: 1000, letterSpacing: 0 }}>
+                      <Typography variant="h4" sx={{ fontWeight: 1000, letterSpacing: 0, fontSize: { xs: 28, md: 34 } }}>
                         {money(rate.buyRateNgn)}
                       </Typography>
                       <Typography variant="caption" color="text.secondary">
@@ -193,10 +193,10 @@ export function TradeView({
         </Grid>
       </Stack>
 
-      <Dialog open={Boolean(selected)} onClose={() => setSelected(null)} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: 6, boxShadow: "0 18px 56px rgba(8,19,59,0.18)" } }}>
-        <DialogTitle sx={{ px: 4, pt: 4, pb: 1 }}>
+      <Dialog open={Boolean(selected)} onClose={() => setSelected(null)} fullWidth maxWidth="sm" PaperProps={{ sx: { borderRadius: { xs: 4, md: 6 }, m: { xs: 1.5, md: 4 }, boxShadow: "0 18px 56px rgba(8,19,59,0.18)" } }}>
+        <DialogTitle sx={{ px: { xs: 2.2, md: 4 }, pt: { xs: 2.2, md: 4 }, pb: 1 }}>
           <Stack direction="row" alignItems="center" justifyContent="space-between" spacing={2}>
-            <Typography sx={{ fontWeight: 1000, fontSize: 34, letterSpacing: "-0.04em" }}>Offer Terms</Typography>
+            <Typography sx={{ fontWeight: 1000, fontSize: { xs: 26, md: 34 }, letterSpacing: "-0.04em" }}>Offer Terms</Typography>
             <IconButton
               aria-label="Close offer terms"
               onClick={() => setSelected(null)}
@@ -206,9 +206,9 @@ export function TradeView({
             </IconButton>
           </Stack>
         </DialogTitle>
-        <DialogContent sx={{ px: 4 }}>
-          <Stack spacing={2.2} sx={{ pt: 1 }}>
-            <Box sx={{ p: 3, borderRadius: 5, bgcolor: "#f8f8ff", border: "1px solid rgba(87,87,246,0.10)" }}>
+        <DialogContent sx={{ px: { xs: 2.2, md: 4 } }}>
+          <Stack spacing={{ xs: 1.6, md: 2.2 }} sx={{ pt: 1 }}>
+            <Box sx={{ p: { xs: 2, md: 3 }, borderRadius: { xs: 4, md: 5 }, bgcolor: "#f8f8ff", border: "1px solid rgba(87,87,246,0.10)" }}>
               <Typography sx={{ fontWeight: 1000 }}>
                 Sell {selected?.coin} at {selected ? money(selected.buyRateNgn) : ""}
               </Typography>
@@ -227,13 +227,13 @@ export function TradeView({
               InputProps={{ startAdornment: <InputAdornment position="start">$</InputAdornment> }}
             />
             {localError && <Alert severity="error">{localError}</Alert>}
-            <Box sx={{ p: 2.5, borderRadius: 5, border: "1px solid rgba(87,87,246,0.12)" }}>
+            <Box sx={{ p: { xs: 2, md: 2.5 }, borderRadius: { xs: 4, md: 5 }, border: "1px solid rgba(87,87,246,0.12)" }}>
               <Stack spacing={1}>
                 <Typography sx={{ fontWeight: 900 }}>Terms</Typography>
                 <Typography variant="body2" color="text.secondary">Release coin to the wallet shown in chat only.</Typography>
                 <Typography variant="body2" color="text.secondary">Upload proof/screenshot if available.</Typography>
                 <Typography variant="body2" color="text.secondary">Send bank name, account number, and account name in chat after release.</Typography>
-                <Typography variant="body2" color="text.secondary">Payment is made after admin confirmation.</Typography>
+                <Typography variant="body2" color="text.secondary">Payment is made after desk confirmation.</Typography>
               </Stack>
             </Box>
             <Stack direction="row" justifyContent="space-between">
@@ -246,7 +246,7 @@ export function TradeView({
             />
           </Stack>
         </DialogContent>
-        <DialogActions sx={{ px: 4, pb: 4 }}>
+        <DialogActions sx={{ px: { xs: 2.2, md: 4 }, pb: { xs: 2.2, md: 4 } }}>
           <Button
             variant="contained"
             fullWidth
