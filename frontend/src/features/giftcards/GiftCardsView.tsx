@@ -171,25 +171,26 @@ export function GiftCardsView({ token, onError }: Props) {
         </Alert>
       )}
 
-      <Grid container spacing={{ xs: 2, md: 3 }} alignItems="flex-start">
+      <Grid container spacing={{ xs: 2, md: 3 }} alignItems="flex-start" sx={{ maxWidth: 1180, mx: "auto" }}>
         <Grid item xs={12} md={7}>
           <Card
             variant="outlined"
             sx={{
-              borderRadius: 3,
+              width: "100%",
+              borderRadius: { xs: 2.5, md: 3 },
               borderColor: "rgba(37,99,235,0.16)",
               boxShadow: "0 18px 44px rgba(37,99,235,0.10)",
               bgcolor: "#f8fbff"
             }}
           >
-            <CardContent sx={{ p: { xs: 2, md: 3 } }}>
-              <Stack spacing={2}>
-                <Stack direction="row" spacing={1} alignItems="center">
-                  <Box sx={{ width: 42, height: 42, display: "grid", placeItems: "center", borderRadius: "50%", bgcolor: "#dbeafe", color: "#1d4ed8" }}>
+            <CardContent sx={{ p: { xs: 1.5, sm: 2, md: 3 } }}>
+              <Stack spacing={{ xs: 1.4, md: 2 }}>
+                <Stack direction="row" spacing={1} alignItems="center" sx={{ minWidth: 0 }}>
+                  <Box sx={{ width: { xs: 38, md: 42 }, height: { xs: 38, md: 42 }, flex: "0 0 auto", display: "grid", placeItems: "center", borderRadius: "50%", bgcolor: "#dbeafe", color: "#1d4ed8" }}>
                     <CreditCardIcon />
                   </Box>
-                  <Box>
-                    <Typography sx={{ fontWeight: 1000, fontSize: { xs: 22, md: 28 }, color: "#08133b", lineHeight: 1.05 }}>
+                  <Box sx={{ minWidth: 0 }}>
+                    <Typography sx={{ fontWeight: 1000, fontSize: { xs: 20, md: 28 }, color: "#08133b", lineHeight: 1.05 }}>
                       Sell gift cards
                     </Typography>
                     <Typography sx={{ color: "#60708c", fontSize: { xs: 13, md: 15 } }}>
@@ -200,7 +201,7 @@ export function GiftCardsView({ token, onError }: Props) {
 
                 <FormControl fullWidth>
                   <InputLabel>Gift card type</InputLabel>
-                  <Select label="Gift card type" value={selectedId} onChange={(event) => setSelectedId(event.target.value)}>
+                  <Select label="Gift card type" value={selectedId} onChange={(event) => setSelectedId(event.target.value)} sx={fieldSx}>
                     {giftCards.map((item) => (
                       <MenuItem key={item.id} value={String(item.id)}>
                         {giftCardLabel(item)}
@@ -224,43 +225,37 @@ export function GiftCardsView({ token, onError }: Props) {
                   </Box>
                 )}
 
-                <Grid container spacing={1.5}>
-                  <Grid item xs={12} sm={6}>
-                    <TextField
-                      label="Card value"
-                      type="number"
-                      fullWidth
-                      value={amount}
-                      error={belowMinimum}
-                      helperText={selected ? `Minimum ${usd(selected.minimum)}` : "Enter total face value"}
-                      onChange={(event) => setAmount(event.target.value)}
-                      InputProps={{ startAdornment: <InputAdornment position="start">$</InputAdornment> }}
-                    />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <FormControl fullWidth>
-                      <InputLabel>Payout method</InputLabel>
-                      <Select label="Payout method" value={payoutMethod} onChange={(event) => setPayoutMethod(event.target.value)}>
-                        {(availablePayouts.length ? availablePayouts : [{ name: "NAIRA", available: true }]).map((method) => (
-                          <MenuItem key={method.name} value={method.name}>{method.name}</MenuItem>
-                        ))}
-                      </Select>
-                    </FormControl>
-                  </Grid>
-                </Grid>
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25} sx={{ width: "100%" }}>
+                  <TextField
+                    label="Card value"
+                    type="number"
+                    fullWidth
+                    value={amount}
+                    error={belowMinimum}
+                    helperText={selected ? `Minimum ${usd(selected.minimum)}` : "Enter total face value"}
+                    onChange={(event) => setAmount(event.target.value)}
+                    InputProps={{ startAdornment: <InputAdornment position="start">$</InputAdornment> }}
+                    FormHelperTextProps={{ sx: { mx: 0, mt: 0.5 } }}
+                    sx={fieldSx}
+                  />
+                  <FormControl fullWidth>
+                    <InputLabel>Payout method</InputLabel>
+                    <Select label="Payout method" value={payoutMethod} onChange={(event) => setPayoutMethod(event.target.value)} sx={fieldSx}>
+                      {(availablePayouts.length ? availablePayouts : [{ name: "NAIRA", available: true }]).map((method) => (
+                        <MenuItem key={method.name} value={method.name}>{method.name}</MenuItem>
+                      ))}
+                    </Select>
+                  </FormControl>
+                </Stack>
 
                 {["USDT", "BITCOINS", "BTC", "LTC", "DOGE"].includes(payoutMethod.toUpperCase()) && (
-                  <TextField label="Payout wallet address" fullWidth value={payoutAddress} onChange={(event) => setPayoutAddress(event.target.value)} />
+                  <TextField label="Payout wallet address" fullWidth value={payoutAddress} onChange={(event) => setPayoutAddress(event.target.value)} sx={fieldSx} />
                 )}
 
-                <Grid container spacing={1.5}>
-                  <Grid item xs={12} sm={6}>
-                    <TextField label="Card code or claim code" fullWidth value={cardCode} onChange={(event) => setCardCode(event.target.value)} />
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <TextField label="PIN (optional)" fullWidth value={pin} onChange={(event) => setPin(event.target.value)} />
-                  </Grid>
-                </Grid>
+                <Stack direction={{ xs: "column", sm: "row" }} spacing={1.25} sx={{ width: "100%" }}>
+                  <TextField label="Card code or claim code" fullWidth value={cardCode} onChange={(event) => setCardCode(event.target.value)} sx={fieldSx} />
+                  <TextField label="PIN (optional)" fullWidth value={pin} onChange={(event) => setPin(event.target.value)} sx={fieldSx} />
+                </Stack>
 
                 <TextField
                   label="Notes for verifier"
@@ -270,15 +265,16 @@ export function GiftCardsView({ token, onError }: Props) {
                   value={comments}
                   onChange={(event) => setComments(event.target.value)}
                   placeholder="Receipt details, country, purchase source, or any other useful note"
+                  sx={fieldSx}
                 />
 
-                <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: "#fff", border: "1px dashed rgba(37,99,235,0.26)" }}>
+                <Box sx={{ p: { xs: 1.25, md: 1.5 }, borderRadius: 2, bgcolor: "#fff", border: "1px dashed rgba(37,99,235,0.26)" }}>
                   <Stack direction={{ xs: "column", sm: "row" }} spacing={1.5} alignItems={{ xs: "stretch", sm: "center" }} justifyContent="space-between">
                     <Box>
                       <Typography sx={{ fontWeight: 900 }}>Upload card images</Typography>
                       <Typography sx={{ color: "#60708c", fontSize: 13 }}>JPG/PNG, clear code and receipt if available. Up to 6 images here.</Typography>
                     </Box>
-                    <Button component="label" variant="outlined" startIcon={<CloudUploadIcon />} sx={{ borderRadius: 999 }}>
+                    <Button component="label" variant="outlined" startIcon={<CloudUploadIcon />} sx={{ borderRadius: 999, minWidth: { xs: "100%", sm: 160 } }}>
                       Choose files
                       <input hidden type="file" accept="image/png,image/jpeg" multiple onChange={(event) => handleFiles(event.target.files)} />
                     </Button>
@@ -292,10 +288,10 @@ export function GiftCardsView({ token, onError }: Props) {
                   )}
                 </Box>
 
-                <Box sx={{ p: 1.5, borderRadius: 2, bgcolor: "#08133b", color: "#fff" }}>
-                  <Stack direction="row" justifyContent="space-between" alignItems="center">
-                    <Typography sx={{ color: "rgba(255,255,255,0.72)" }}>Estimated Prestmit payout</Typography>
-                    <Typography sx={{ fontWeight: 1000, fontSize: { xs: 21, md: 28 } }}>{money(estimated)}</Typography>
+                <Box sx={{ p: { xs: 1.25, md: 1.5 }, borderRadius: 2, bgcolor: "#08133b", color: "#fff" }}>
+                  <Stack direction="row" justifyContent="space-between" alignItems="center" spacing={1.5}>
+                    <Typography sx={{ color: "rgba(255,255,255,0.72)", fontSize: { xs: 13.5, md: 16 } }}>Estimated Prestmit payout</Typography>
+                    <Typography sx={{ fontWeight: 1000, fontSize: { xs: 22, md: 28 }, whiteSpace: "nowrap" }}>{money(estimated)}</Typography>
                   </Stack>
                 </Box>
 
@@ -305,7 +301,7 @@ export function GiftCardsView({ token, onError }: Props) {
                   disabled={submitting || !config?.configured}
                   onClick={submit}
                   startIcon={submitting ? <CircularProgress size={18} color="inherit" /> : <SendIcon />}
-                  sx={{ bgcolor: "#1d4ed8", borderRadius: 999, py: 1.25, "&:hover": { bgcolor: "#1e40af" } }}
+                  sx={{ bgcolor: "#1d4ed8", borderRadius: 999, py: 1.25, px: 2, "&:hover": { bgcolor: "#1e40af" }, "& .MuiButton-startIcon": { mr: { xs: 0.5, sm: 1 } } }}
                 >
                   {submitting ? "Submitting..." : "Submit for Prestmit verification"}
                 </Button>
@@ -315,10 +311,10 @@ export function GiftCardsView({ token, onError }: Props) {
         </Grid>
 
         <Grid item xs={12} md={5}>
-          <Stack spacing={1.5}>
-            <Typography sx={{ fontWeight: 1000, color: "#08133b", fontSize: { xs: 20, md: 24 } }}>Recent submissions</Typography>
+          <Stack spacing={1.25} sx={{ width: "100%" }}>
+            <Typography sx={{ fontWeight: 1000, color: "#08133b", fontSize: { xs: 22, md: 24 }, lineHeight: 1.1 }}>Recent submissions</Typography>
             {orders.length === 0 && (
-              <Paper variant="outlined" sx={{ p: 2, borderRadius: 3, color: "#60708c" }}>
+              <Paper variant="outlined" sx={{ p: { xs: 1.5, md: 2 }, borderRadius: 3, color: "#60708c", bgcolor: "#fff", width: "100%" }}>
                 No gift card submissions yet.
               </Paper>
             )}
@@ -375,6 +371,21 @@ function giftCardLabel(item: SellableGiftCard) {
   const category = item.category?.name || "Gift card";
   return `${category} - ${item.name} (${item.form || "card"}, ${item.country || "global"})`;
 }
+
+const fieldSx = {
+  "& .MuiOutlinedInput-root": {
+    minHeight: { xs: 56, md: 58 },
+    borderRadius: 2,
+    bgcolor: "#fff",
+    alignItems: "center"
+  },
+  "& .MuiInputLabel-root": {
+    color: "#60708c"
+  },
+  "& .MuiInputBase-input": {
+    py: { xs: 1.35, md: 1.45 }
+  }
+};
 
 function readFile(file: File): Promise<GiftCardAttachment> {
   return new Promise((resolve, reject) => {
