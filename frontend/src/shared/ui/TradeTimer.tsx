@@ -26,14 +26,14 @@ export function TradeTimer({ trade, onExpired, dark = false }: { trade: Trade; o
   }, [remaining, onExpired]);
 
   return (
-    <Stack spacing={1}>
+    <Stack spacing={0.7}>
       <Stack direction="row" alignItems="center" spacing={1}>
-        <TimerIcon color={dark ? "secondary" : "primary"} />
-        <Typography sx={{ fontWeight: 1000, color: dark ? "#fff" : "text.primary" }}>
+        <TimerIcon color={dark ? "secondary" : "primary"} sx={{ fontSize: { xs: 22, md: 24 } }} />
+        <Typography sx={{ fontWeight: 1000, color: dark ? "#fff" : "text.primary", fontSize: { xs: 20, md: 24 }, lineHeight: 1 }}>
           {String(minutes).padStart(2, "0")}:{String(seconds).padStart(2, "0")}
         </Typography>
       </Stack>
-      <LinearProgress variant="determinate" value={progress} color={progress < 25 ? "error" : "secondary"} />
+      <LinearProgress variant="determinate" value={progress} color={progress < 25 ? "error" : "secondary"} sx={{ height: 6, borderRadius: 999 }} />
     </Stack>
   );
 }

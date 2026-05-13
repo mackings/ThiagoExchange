@@ -248,7 +248,7 @@ function ExchangeApp() {
                   color: "#08133b",
                   border: "1px solid rgba(8,19,59,0.10)",
                   borderRadius: { xs: 3, md: 4 },
-                  boxShadow: "0 24px 70px rgba(8,19,59,0.12)",
+                  boxShadow: "0 18px 48px rgba(8,19,59,0.10)",
                   background: "#fff",
                   position: "relative",
                   overflow: "hidden",
@@ -263,39 +263,41 @@ function ExchangeApp() {
                     : undefined
                 }}
               >
-                <CardContent sx={{ p: { xs: 2, md: 3.5 } }}>
-                  <Stack spacing={{ xs: 1.7, md: 2.5 }}>
+                <CardContent sx={{ p: { xs: 1.6, md: 2.6 } }}>
+                  <Stack spacing={{ xs: 1.25, md: 1.8 }}>
                     <Stack direction="row" justifyContent="space-between" alignItems="center">
                       <Chip
                         size="small"
                         label="LIVE TRADE STATUS"
                         sx={{
-                          letterSpacing: 1.8,
+                          height: 30,
+                          letterSpacing: 1.5,
                           fontWeight: 1000,
+                          fontSize: { xs: 11, md: 12 },
                           color: activeTrade ? "#08133b" : "#53627c",
                           bgcolor: activeTrade ? "#f6f7fb" : "#f8fafc",
                           border: "1px solid rgba(8,19,59,0.08)"
                         }}
                       />
-                      <Box sx={{ width: 44, height: 44, display: "grid", placeItems: "center", borderRadius: "50%", bgcolor: activeTrade ? "#08133b" : "#f0efff", boxShadow: activeTrade ? "0 10px 24px rgba(8,19,59,0.18)" : "none" }}>
-                        <TimerIcon sx={{ color: activeTrade ? "#fff" : "#5757f6" }} />
+                      <Box sx={{ width: 38, height: 38, display: "grid", placeItems: "center", borderRadius: "50%", bgcolor: activeTrade ? "#08133b" : "#f0efff", boxShadow: activeTrade ? "0 8px 18px rgba(8,19,59,0.16)" : "none" }}>
+                        <TimerIcon sx={{ color: activeTrade ? "#fff" : "#5757f6", fontSize: 21 }} />
                       </Box>
                     </Stack>
                     {activeTrade ? (
                       <>
                         <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={2}>
                           <Box>
-                            <Typography variant="h4" sx={{ fontWeight: 1000, letterSpacing: "-0.04em", fontSize: { xs: 24, md: 34 } }}>
+                            <Typography variant="h4" sx={{ fontWeight: 1000, letterSpacing: "-0.035em", fontSize: { xs: 22, md: 30 }, lineHeight: 1.05 }}>
                               {activeTrade.coin} {usd(activeTrade.amountUsd)}
                             </Typography>
-                            <Typography sx={{ mt: 0.5, color: "#64708a" }}>
+                            <Typography sx={{ mt: 0.35, color: "#64708a", fontSize: { xs: 14, md: 16 } }}>
                               Expected payout {money(activeTrade.expectedNgn)}
                             </Typography>
                           </Box>
                           <StatusChip status={activeTrade.status} />
                         </Stack>
                         <TradeTimer trade={activeTrade} onExpired={() => loadTrades()} />
-                        <Grid container spacing={1.2}>
+                        <Grid container spacing={1}>
                           {[
                             ["Network", activeTrade.network],
                             ["Rate", `${money(activeTrade.rateNgn)} / $1`],
@@ -303,14 +305,14 @@ function ExchangeApp() {
                             ["Chat", `${activeTrade.messages?.length || 0} messages`]
                           ].map(([label, value]) => (
                             <Grid item xs={6} key={label}>
-                              <Box sx={{ p: 1.5, minHeight: 86, borderRadius: 2, bgcolor: "#f8fafc", border: "1px solid rgba(8,19,59,0.08)" }}>
-                                <Typography variant="caption" sx={{ color: "#64708a", fontWeight: 800 }}>{label}</Typography>
-                                <Typography sx={{ fontWeight: 1000, wordBreak: "break-word" }}>{value}</Typography>
+                              <Box sx={{ p: { xs: 1.05, md: 1.25 }, minHeight: { xs: 66, md: 76 }, borderRadius: 2, bgcolor: "#f8fafc", border: "1px solid rgba(8,19,59,0.08)" }}>
+                                <Typography variant="caption" sx={{ color: "#64708a", fontWeight: 800, fontSize: { xs: 11, md: 12 } }}>{label}</Typography>
+                                <Typography sx={{ fontWeight: 1000, wordBreak: "break-word", fontSize: { xs: 14, md: 16 }, lineHeight: 1.25 }}>{value}</Typography>
                               </Box>
                             </Grid>
                           ))}
                         </Grid>
-                        <Button variant="contained" href={`/trades/${activeTrade.id}`} sx={{ bgcolor: "#08133b", color: "#fff", borderRadius: 999, "&:hover": { bgcolor: "#050b24" } }}>
+                        <Button variant="contained" href={`/trades/${activeTrade.id}`} sx={{ minHeight: { xs: 42, md: 46 }, bgcolor: "#08133b", color: "#fff", borderRadius: 999, "&:hover": { bgcolor: "#050b24" } }}>
                           Continue Chat
                         </Button>
                       </>
@@ -494,13 +496,13 @@ function MarketSlider({ rates }: { rates: Rate[] }) {
       }));
 
   return (
-    <Box sx={{ overflow: "hidden", width: "100%" }}>
+    <Box sx={{ overflow: "hidden", width: "100%", maxHeight: { xs: 82, md: 92 } }}>
       <Stack
         direction="row"
-        spacing={1.2}
+        spacing={0.8}
         sx={{
           width: "max-content",
-          p: 1,
+          p: 0.45,
           animation: "marketSlide 28s linear infinite",
           "@keyframes marketSlide": {
             "0%": { transform: "translateX(0)" },
@@ -512,27 +514,28 @@ function MarketSlider({ rates }: { rates: Rate[] }) {
           <Box
             key={`${item.key}-${index}`}
             sx={{
-              minWidth: { xs: 190, md: 232 },
-              p: 1.4,
-              borderRadius: 3,
+              minWidth: { xs: 152, md: 188 },
+              p: { xs: 0.8, md: 1 },
+              borderRadius: 2.5,
               bgcolor: "#fff",
-              border: "1px solid rgba(87,87,246,0.10)"
+              border: "1px solid rgba(87,87,246,0.10)",
+              boxShadow: "0 10px 24px rgba(8,19,59,0.05)"
             }}
           >
-            <Stack direction="row" spacing={1} alignItems="center">
+            <Stack direction="row" spacing={0.8} alignItems="center">
               <Box
                 component="img"
                 src={coinLogos[item.coin] || coinLogos.USDT}
                 alt={`${item.coin} logo`}
-                sx={{ width: 34, height: 34, borderRadius: "50%", bgcolor: "#fff", objectFit: "contain", boxShadow: "0 4px 12px rgba(8,19,59,0.10)" }}
+                sx={{ width: { xs: 26, md: 30 }, height: { xs: 26, md: 30 }, borderRadius: "50%", bgcolor: "#fff", objectFit: "contain", boxShadow: "0 4px 10px rgba(8,19,59,0.08)" }}
               />
-              <Box>
-                <Typography sx={{ fontWeight: 1000, fontSize: 14 }}>{item.pair}</Typography>
-                <Stack direction="row" spacing={0.8} alignItems="center">
-                  <Typography sx={{ fontWeight: 1000, color: "#5757f6" }}>{item.price}</Typography>
-                  <Typography sx={{ fontWeight: 900, fontSize: 12, color: item.positive ? "#0f7a40" : "#b42318" }}>{item.change}</Typography>
+              <Box sx={{ minWidth: 0 }}>
+                <Typography sx={{ fontWeight: 1000, fontSize: { xs: 12.5, md: 13.5 }, lineHeight: 1.15, whiteSpace: "nowrap" }}>{item.pair}</Typography>
+                <Stack direction="row" spacing={0.6} alignItems="baseline">
+                  <Typography sx={{ fontWeight: 1000, color: "#5757f6", fontSize: { xs: 13, md: 15 }, lineHeight: 1.2, whiteSpace: "nowrap" }}>{item.price}</Typography>
+                  <Typography sx={{ fontWeight: 900, fontSize: { xs: 10.5, md: 11.5 }, color: item.positive ? "#0f7a40" : "#b42318", whiteSpace: "nowrap" }}>{item.change}</Typography>
                 </Stack>
-                <Typography sx={{ color: "#66708a", fontSize: 11 }}>{item.source} live rate</Typography>
+                <Typography sx={{ color: "#66708a", fontSize: { xs: 9.5, md: 10.5 }, lineHeight: 1.2 }}>{item.source} live rate</Typography>
               </Box>
             </Stack>
           </Box>
@@ -541,16 +544,16 @@ function MarketSlider({ rates }: { rates: Rate[] }) {
           <Box
             key={name}
             sx={{
-              minWidth: 132,
-              p: 1.4,
-              borderRadius: 3,
+              minWidth: { xs: 104, md: 120 },
+              p: { xs: 0.8, md: 1 },
+              borderRadius: 2.5,
               bgcolor: "#08133b",
               color: "#fff",
               border: "1px solid rgba(255,255,255,0.16)"
             }}
           >
-            <Typography sx={{ fontWeight: 1000, fontSize: 14 }}>{name}</Typography>
-            <Typography sx={{ color: "rgba(255,255,255,0.66)", fontSize: 12 }}>{marketError || "exchange signal"}</Typography>
+            <Typography sx={{ fontWeight: 1000, fontSize: { xs: 12.5, md: 13.5 }, lineHeight: 1.2 }}>{name}</Typography>
+            <Typography sx={{ color: "rgba(255,255,255,0.66)", fontSize: { xs: 9.5, md: 10.5 }, lineHeight: 1.25 }}>{marketError || "exchange signal"}</Typography>
           </Box>
         ))}
       </Stack>

@@ -154,19 +154,20 @@ export function TradeChat({
 
   return (
     <Stack
-      spacing={{ xs: 1.5, md: 2 }}
+      spacing={{ xs: 1, md: 1.5 }}
       sx={{
         minHeight: compact ? "auto" : { xs: "calc(100vh - 156px)", md: "calc(100vh - 190px)" }
       }}
     >
       <Box
         sx={{
-          p: { xs: 1.6, md: 2.6 },
+          p: { xs: 1.25, md: 2 },
+          pl: { xs: 1.6, md: 2.4 },
           color: "#08133b",
-          borderRadius: { xs: 3, md: 4 },
+          borderRadius: { xs: 2.5, md: 3.5 },
           bgcolor: "#fff",
           border: "1px solid rgba(8,19,59,0.10)",
-          boxShadow: "0 18px 48px rgba(8,19,59,0.10)",
+          boxShadow: "0 14px 36px rgba(8,19,59,0.09)",
           position: "relative",
           overflow: "hidden",
           "&::before": {
@@ -178,22 +179,22 @@ export function TradeChat({
           }
         }}
       >
-        <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" spacing={2}>
-          <Stack spacing={1}>
+        <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" spacing={{ xs: 1.1, md: 2 }}>
+          <Stack spacing={0.9}>
             <Stack direction="row" spacing={1} alignItems="center">
-              <Avatar sx={{ bgcolor: "#08133b", color: "#fff", fontWeight: 1000, width: { xs: 42, md: 52 }, height: { xs: 42, md: 52 }, boxShadow: "0 10px 24px rgba(8,19,59,0.16)" }}>
+              <Avatar sx={{ bgcolor: "#08133b", color: "#fff", fontWeight: 1000, width: { xs: 36, md: 46 }, height: { xs: 36, md: 46 }, boxShadow: "0 8px 18px rgba(8,19,59,0.14)" }}>
                 {trade.coin.slice(0, 1)}
               </Avatar>
               <Box>
                 <Typography variant={compact ? "subtitle1" : "h6"} sx={{ fontWeight: 1000, fontSize: { xs: 16, md: compact ? 16 : 20 } }}>
                   {trade.coin} trade thread
                 </Typography>
-                <Typography variant="body2" sx={{ color: "#64708a" }}>
+                <Typography variant="body2" sx={{ color: "#64708a", fontSize: { xs: 13, md: 14 } }}>
                   {usd(trade.amountUsd)} on {trade.network}
                 </Typography>
               </Box>
             </Stack>
-            <Stack direction="row" spacing={1} flexWrap="wrap" useFlexGap>
+            <Stack direction="row" spacing={0.7} flexWrap="wrap" useFlexGap sx={{ "& .MuiChip-root": { height: { xs: 24, md: 28 } }, "& .MuiChip-label": { px: { xs: 0.8, md: 1 }, fontSize: { xs: 11.5, md: 13 } } }}>
               <StatusChip status={trade.status} />
               <Chip size="small" icon={<VerifiedIcon />} label="Thiago Desk" sx={{ bgcolor: "#f0efff", color: "#3035bf", fontWeight: 900 }} />
               <Chip size="small" label={connected ? "Live" : "Reconnecting"} sx={{ bgcolor: connected ? "#eafff2" : "#fff6e5", color: connected ? "#0f7a40" : "#9a5b00", fontWeight: 1000 }} />
@@ -202,15 +203,28 @@ export function TradeChat({
             </Stack>
           </Stack>
           {trade.status === "pending" && (
-            <Box sx={{ minWidth: { xs: "100%", sm: 180 } }}>
+            <Box sx={{ minWidth: { xs: "100%", sm: 170 }, maxWidth: { sm: 220 } }}>
               <TradeTimer trade={trade} onExpired={onRefresh} />
             </Box>
           )}
         </Stack>
       </Box>
 
-      <Stack spacing={{ xs: 1.5, md: 2 }} sx={{ flex: 1, minHeight: 0 }}>
-        <Alert severity="info" icon={<WalletIcon />} sx={{ borderRadius: 4, bgcolor: "#f7f8ff", color: "#08133b", border: "1px solid rgba(87,87,246,0.12)" }}>
+      <Stack spacing={{ xs: 1, md: 1.5 }} sx={{ flex: 1, minHeight: 0 }}>
+        <Alert
+          severity="info"
+          icon={<WalletIcon />}
+          sx={{
+            py: { xs: 0.7, md: 0.9 },
+            px: { xs: 1, md: 1.4 },
+            borderRadius: 2.5,
+            bgcolor: "#f7f8ff",
+            color: "#08133b",
+            border: "1px solid rgba(87,87,246,0.12)",
+            "& .MuiAlert-message": { py: 0, fontSize: { xs: 13.5, md: 15 }, lineHeight: 1.4 },
+            "& .MuiAlert-icon": { py: 0.1, mr: 1 }
+          }}
+        >
           Send coin to <strong>{trade.walletAddress}</strong>
           <Tooltip title="Copy wallet">
             <IconButton size="small" onClick={() => navigator.clipboard.writeText(trade.walletAddress)} sx={{ ml: 0.5 }}>
@@ -220,17 +234,17 @@ export function TradeChat({
         </Alert>
 
         <Stack
-          spacing={1.2}
+          spacing={0.85}
           sx={{
             flex: 1,
             minHeight: compact ? 320 : { xs: "50vh", md: "56vh" },
             maxHeight: compact ? 320 : "none",
             overflowY: "auto",
             pr: 0.5,
-            p: { xs: 1, md: 1.4 },
-            bgcolor: "#eef3f0",
+            p: { xs: 0.85, md: 1.1 },
+            bgcolor: "#edf4f0",
             border: "1px solid rgba(8,19,59,0.08)",
-            borderRadius: { xs: 3, md: 4 }
+            borderRadius: { xs: 2.5, md: 3.5 }
           }}
         >
           {messages.map((item) => {
@@ -238,16 +252,16 @@ export function TradeChat({
             const isAdmin = item.sender === "admin";
             const isSystem = item.sender === "system";
             return (
-              <Stack key={item.id} direction="row" justifyContent={isSystem ? "center" : isUser ? "flex-end" : "flex-start"}>
+              <Stack key={item.id} direction="row" justifyContent={isUser ? "flex-end" : "flex-start"}>
                 <Box
                   sx={{
-                    maxWidth: isSystem ? { xs: "92%", md: "68%" } : { xs: "88%", md: "72%" },
-                    px: isSystem ? { xs: 1.2, md: 1.5 } : { xs: 1.35, md: 1.7 },
-                    py: isSystem ? 0.8 : { xs: 1, md: 1.2 },
-                    borderRadius: isSystem ? 999 : isUser ? "18px 18px 4px 18px" : "18px 18px 18px 4px",
-                    bgcolor: isSystem ? "rgba(255,255,255,0.72)" : isUser ? "#dcf8c6" : isAdmin ? "#fff" : "#f8fafc",
+                    maxWidth: isSystem ? { xs: "78%", md: "62%" } : { xs: "78%", md: "68%" },
+                    px: { xs: 1.15, md: 1.35 },
+                    py: { xs: 0.8, md: 0.95 },
+                    borderRadius: isUser ? "16px 16px 4px 16px" : "16px 16px 16px 4px",
+                    bgcolor: isUser ? "#dcf8c6" : isSystem ? "#f7f8fa" : "#fff",
                     color: "#08133b",
-                    border: isAdmin ? "1px solid rgba(8,19,59,0.08)" : isSystem ? "1px solid rgba(8,19,59,0.06)" : 0,
+                    border: isUser ? 0 : "1px solid rgba(8,19,59,0.07)",
                     boxShadow: isSystem ? "none" : "0 6px 18px rgba(8,19,59,0.08)",
                     position: "relative",
                     "&::after": isSystem
@@ -265,15 +279,15 @@ export function TradeChat({
                         }
                   }}
                 >
-                  <Stack direction="row" justifyContent={isSystem ? "center" : "space-between"} spacing={2} alignItems="center">
-                    <Typography variant="caption" sx={{ fontWeight: 1000, color: isUser ? "#0f7a40" : isAdmin ? "#3035bf" : "#64708a" }}>
+                  <Stack direction="row" justifyContent="space-between" spacing={1} alignItems="center">
+                    <Typography variant="caption" sx={{ fontWeight: 1000, color: isUser ? "#0f7a40" : isAdmin ? "#3035bf" : "#64708a", fontSize: { xs: 11.5, md: 12.5 }, lineHeight: 1.2 }}>
                       {isSystem ? "Thiago Bot" : isAdmin ? "Thiago Desk" : "You"}
                     </Typography>
-                    <Typography variant="caption" sx={{ fontWeight: 800, color: "#64708a", whiteSpace: "nowrap" }}>
+                    <Typography variant="caption" sx={{ fontWeight: 800, color: "#64708a", whiteSpace: "nowrap", fontSize: { xs: 11, md: 12 } }}>
                       {formatMessageTime(item.createdAt)}
                     </Typography>
                   </Stack>
-                  <Typography sx={{ mt: isSystem ? 0.2 : 0.4, whiteSpace: "pre-wrap", fontSize: { xs: 13.5, md: 15.5 }, lineHeight: 1.5 }}>{item.body}</Typography>
+                  <Typography sx={{ mt: 0.35, whiteSpace: "pre-wrap", fontSize: { xs: 13.5, md: 15 }, lineHeight: 1.45 }}>{item.body}</Typography>
                   {item.attachmentUrl && (
                     <Box
                       component="img"
