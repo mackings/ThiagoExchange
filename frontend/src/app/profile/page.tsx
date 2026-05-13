@@ -20,7 +20,12 @@ export default function ProfilePage() {
   const [checkingSession, setCheckingSession] = useState(true);
 
   useEffect(() => {
-    setSession(readSession());
+    const saved = readSession();
+    if (!saved) {
+      window.location.replace("/login?next=/profile");
+      return;
+    }
+    setSession(saved);
     setCheckingSession(false);
     loadRates();
   }, []);
@@ -36,7 +41,7 @@ export default function ProfilePage() {
 
   function logout() {
     clearSession();
-    window.location.href = "/";
+    window.location.href = "/login";
   }
 
   return (

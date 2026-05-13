@@ -72,9 +72,11 @@ function ExchangeApp() {
 
   useEffect(() => {
     const saved = localStorage.getItem(sessionKey);
-    if (saved) {
-      setSession(JSON.parse(saved));
+    if (!saved) {
+      window.location.replace("/login?next=/");
+      return;
     }
+    setSession(JSON.parse(saved));
     loadRates();
   }, []);
 
@@ -133,6 +135,15 @@ function ExchangeApp() {
     setSession(null);
     setTrades([]);
     setActiveTab(0);
+    window.location.href = "/login";
+  }
+
+  if (!session) {
+    return (
+      <Box sx={{ minHeight: "100vh", display: "grid", placeItems: "center", color: "#08133b", fontWeight: 900 }}>
+        Redirecting to sign in...
+      </Box>
+    );
   }
 
   return (

@@ -83,7 +83,7 @@ export function AuthPageView({ mode }: { mode: AuthMode }) {
               }}
             >
               <Stack spacing={2}>
-                <Button href="/" sx={{ alignSelf: "flex-start", p: 0, minHeight: "auto" }}>
+                <Button href={isLogin ? "/login" : "/register"} sx={{ alignSelf: "flex-start", p: 0, minHeight: "auto" }}>
                   <Image src="/thiago-logo.svg" alt="Thiago Exchange" width={158} height={44} priority />
                 </Button>
                 <Chip
@@ -138,11 +138,6 @@ export function AuthPageView({ mode }: { mode: AuthMode }) {
                       {isLogin ? "Enter your details to open your dashboard." : "Create your profile and continue to the app."}
                     </Typography>
                   </Box>
-
-                  <Stack direction="row" sx={{ p: 0.5, borderRadius: 999, bgcolor: "#eaf2ff", border: "1px solid rgba(37,99,235,0.10)" }}>
-                    <Button fullWidth href={`/login?next=${encodeURIComponent(nextPath)}`} sx={segmentStyle(isLogin)}>Sign in</Button>
-                    <Button fullWidth href={`/register?next=${encodeURIComponent(nextPath)}`} sx={segmentStyle(!isLogin)}>Register</Button>
-                  </Stack>
 
                   {error && (
                     <Paper sx={{ p: 1.4, borderRadius: 2, bgcolor: "#fff1f2", color: "#be123c", border: "1px solid #fecdd3" }}>
@@ -205,14 +200,4 @@ export function AuthPageView({ mode }: { mode: AuthMode }) {
       </Container>
     </Box>
   );
-}
-
-function segmentStyle(active: boolean) {
-  return {
-    minHeight: 42,
-    color: active ? "#08133b" : "#60708c",
-    bgcolor: active ? "#fff" : "transparent",
-    boxShadow: active ? "0 8px 20px rgba(37,99,235,0.10)" : "none",
-    "&:hover": { bgcolor: active ? "#fff" : "rgba(255,255,255,0.56)" }
-  };
 }

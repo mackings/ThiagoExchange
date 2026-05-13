@@ -2,7 +2,6 @@
 
 import { useEffect, useState } from "react";
 import Alert from "@mui/material/Alert";
-import Button from "@mui/material/Button";
 import Stack from "@mui/material/Stack";
 import type { Session } from "@/features/auth/types";
 import { GiftCardsView } from "@/features/giftcards/GiftCardsView";
@@ -15,6 +14,10 @@ export default function GiftCardsPage() {
 
   useEffect(() => {
     const saved = readSession();
+    if (!saved) {
+      window.location.replace("/login?next=/giftcards");
+      return;
+    }
     setSession(saved);
   }, []);
 
@@ -22,16 +25,7 @@ export default function GiftCardsPage() {
     <PageFrame title="Gift cards">
       <Stack spacing={2}>
         {error && <Alert severity="error" onClose={() => setError("")}>{error}</Alert>}
-        {!session ? (
-          <Alert
-            severity="info"
-            action={<Button href="/login?next=/giftcards">Sign in</Button>}
-          >
-            Sign in to submit gift cards for Prestmit verification.
-          </Alert>
-        ) : (
-          <GiftCardsView token={session.token} onError={setError} />
-        )}
+        {!session ? <Alert severity="info">Redirecting to sign in...</Alert> : <GiftCardsView token={session.token} onError={setError} />}
       </Stack>
     </PageFrame>
   );

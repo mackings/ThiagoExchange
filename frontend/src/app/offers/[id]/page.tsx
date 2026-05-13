@@ -23,6 +23,10 @@ export default function OfferDetailsPage() {
 
   useEffect(() => {
     const saved = readSession();
+    if (!saved) {
+      window.location.replace(`/login?next=/offers/${params.id}`);
+      return;
+    }
     setSession(saved);
     loadRates();
     if (saved?.token) loadTrades(saved.token);

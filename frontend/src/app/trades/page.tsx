@@ -28,6 +28,10 @@ export default function ActiveTradesPage() {
 
   useEffect(() => {
     const saved = readSession();
+    if (!saved) {
+      window.location.replace("/login?next=/trades");
+      return;
+    }
     setSession(saved);
     if (saved?.token) {
       loadTrades(saved.token);
@@ -54,7 +58,7 @@ export default function ActiveTradesPage() {
     <PageFrame title="Active trades">
       <Stack spacing={1.5}>
         {error && <Alert severity="error" onClose={() => setError("")}>{error}</Alert>}
-        {!session && <Alert severity="info">Sign in from home to view active trades.</Alert>}
+        {!session && <Alert severity="info">Redirecting to sign in...</Alert>}
         {loading && <ActiveTradesSkeleton />}
         {session && !loading && !activeTrades.length && <Alert severity="info">No active trades right now.</Alert>}
         <Grid container spacing={{ xs: 1.5, md: 2 }}>

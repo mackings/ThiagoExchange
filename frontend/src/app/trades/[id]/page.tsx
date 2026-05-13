@@ -22,6 +22,10 @@ export default function TradingGroundPage() {
 
   useEffect(() => {
     const saved = readSession();
+    if (!saved) {
+      window.location.replace(`/login?next=/trades/${params.id}`);
+      return;
+    }
     setSession(saved);
     if (saved?.token && params.id) {
       loadTrade(saved.token);
@@ -47,7 +51,7 @@ export default function TradingGroundPage() {
     <PageFrame title="Trading ground">
       <Stack spacing={1.5}>
         {error && <Alert severity="error" onClose={() => setError("")}>{error}</Alert>}
-        {!session && <Alert severity="info">Sign in from home to open the trading ground.</Alert>}
+        {!session && <Alert severity="info">Redirecting to sign in...</Alert>}
         {session && loading && !trade && <TradingGroundSkeleton />}
         {trade && (
           <TradeChat
