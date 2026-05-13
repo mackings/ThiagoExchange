@@ -18,6 +18,7 @@ import { readSession } from "@/shared/session";
 import { StatusChip } from "@/shared/ui/StatusChip";
 import { PageFrame } from "@/shared/ui/PageFrame";
 import { TradeTimer } from "@/shared/ui/TradeTimer";
+import { CoinIcon } from "@/shared/ui/CoinIcon";
 
 export default function ActiveTradesPage() {
   const [session, setSession] = useState<Session | null>(null);
@@ -65,21 +66,24 @@ export default function ActiveTradesPage() {
                   height: "100%",
                   overflow: "hidden",
                   borderRadius: { xs: 3, md: 4 },
-                  borderColor: "rgba(8,19,59,0.10)",
-                  bgcolor: "#fff",
-                  boxShadow: "0 16px 42px rgba(8,19,59,0.08)"
+                  borderColor: "rgba(37,99,235,0.14)",
+                  bgcolor: "#f8fbff",
+                  boxShadow: "0 16px 42px rgba(37,99,235,0.10)"
                 }}
               >
-                <Box sx={{ height: 5, bgcolor: trade.status === "pending" ? "#d49416" : "#0f7a62" }} />
+                <Box sx={{ height: 5, bgcolor: trade.status === "pending" ? "#2563eb" : "#0ea5e9" }} />
                 <CardContent sx={{ p: { xs: 1.6, md: 2.5 } }}>
                   <Stack spacing={1.5}>
                     <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={1.5}>
-                      <Box>
+                      <Stack direction="row" spacing={1} alignItems="center">
+                        <CoinIcon coin={trade.coin} size={42} />
+                        <Box>
                         <Typography sx={{ fontWeight: 1000, fontSize: { xs: 20, md: 26 }, letterSpacing: "-0.035em" }}>
-                          {trade.coin} {usd(trade.amountUsd)}
+                          {usd(trade.amountUsd)}
                         </Typography>
                         <Typography color="text.secondary">{trade.network} secured desk trade</Typography>
-                      </Box>
+                        </Box>
+                      </Stack>
                       <StatusChip status={trade.status} />
                     </Stack>
                     <Grid container spacing={1}>
@@ -90,7 +94,7 @@ export default function ActiveTradesPage() {
                         ["Chat", `${trade.messages?.length || 0} messages`]
                       ].map(([label, value]) => (
                         <Grid item xs={6} key={label}>
-                          <Box sx={{ p: 1.25, minHeight: 70, borderRadius: 2, bgcolor: "#f8fafc", border: "1px solid rgba(8,19,59,0.08)" }}>
+                          <Box sx={{ p: 1.25, minHeight: 70, borderRadius: 2, bgcolor: "#fff", border: "1px solid rgba(37,99,235,0.12)" }}>
                             <Typography variant="caption" sx={{ color: "#66708a", fontWeight: 900 }}>{label}</Typography>
                             <Typography sx={{ fontWeight: 1000, fontSize: { xs: 13.5, md: 15 }, wordBreak: "break-word" }}>{value}</Typography>
                           </Box>
@@ -98,7 +102,7 @@ export default function ActiveTradesPage() {
                       ))}
                     </Grid>
                     {trade.status === "pending" ? <TradeTimer trade={trade} onExpired={() => session?.token && loadTrades(session.token)} /> : <LinearProgress variant="determinate" value={100} sx={{ height: 8, borderRadius: 999 }} />}
-                    <Button variant="contained" href={`/trades/${trade.id}`} sx={{ bgcolor: "#08133b", borderRadius: 999, "&:hover": { bgcolor: "#050b24" } }}>
+                    <Button variant="contained" href={`/trades/${trade.id}`} sx={{ bgcolor: "#1d4ed8", borderRadius: 999, "&:hover": { bgcolor: "#1e40af" } }}>
                       Open Trading Ground
                     </Button>
                   </Stack>

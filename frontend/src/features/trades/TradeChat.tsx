@@ -2,7 +2,6 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import Alert from "@mui/material/Alert";
-import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
@@ -28,6 +27,7 @@ import type { Trade } from "@/shared/api";
 import { api, money, usd, wsUrl } from "@/shared/api";
 import { StatusChip } from "@/shared/ui/StatusChip";
 import { TradeTimer } from "@/shared/ui/TradeTimer";
+import { CoinIcon } from "@/shared/ui/CoinIcon";
 
 export function TradeChat({
   trade,
@@ -194,12 +194,10 @@ export function TradeChat({
         <Stack direction={{ xs: "column", sm: "row" }} justifyContent="space-between" spacing={{ xs: 1.1, md: 2 }}>
           <Stack spacing={0.9}>
             <Stack direction="row" spacing={1} alignItems="center">
-              <Avatar sx={{ bgcolor: "#08133b", color: "#fff", fontWeight: 1000, width: { xs: 36, md: 46 }, height: { xs: 36, md: 46 }, boxShadow: "0 8px 18px rgba(8,19,59,0.14)" }}>
-                {trade.coin.slice(0, 1)}
-              </Avatar>
+              <CoinIcon coin={trade.coin} size={46} />
               <Box>
                 <Typography variant={compact ? "subtitle1" : "h6"} sx={{ fontWeight: 1000, fontSize: { xs: 16, md: compact ? 16 : 20 } }}>
-                  {trade.coin} trade thread
+                  Trade thread
                 </Typography>
                 <Typography variant="body2" sx={{ color: "#64708a", fontSize: { xs: 13, md: 14 } }}>
                   {usd(trade.amountUsd)} on {trade.network}
@@ -390,8 +388,12 @@ export function TradeChat({
       >
         <DialogTitle sx={{ pb: 0.5, fontWeight: 1000, color: "#08133b" }}>Cancel this trade?</DialogTitle>
         <DialogContent sx={{ pt: 1 }}>
+          <Stack direction="row" spacing={1} alignItems="center" sx={{ mb: 1 }}>
+            <CoinIcon coin={trade.coin} size={28} />
+            <Typography sx={{ fontWeight: 1000, color: "#08133b" }}>{usd(trade.amountUsd)}</Typography>
+          </Stack>
           <Typography sx={{ color: "#64708a", fontSize: 14.5, lineHeight: 1.55 }}>
-            This will close the trading ground for {trade.coin} {usd(trade.amountUsd)}. Only continue if you no longer want to complete this trade.
+            This will close the trading ground. Only continue if you no longer want to complete this trade.
           </Typography>
         </DialogContent>
         <DialogActions sx={{ px: 3, pb: 2.5, pt: 0 }}>

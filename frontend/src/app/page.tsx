@@ -36,6 +36,7 @@ import { TradeView } from "@/features/trades/TradeView";
 import { API_HEALTH_URL, Rate, Trade, api, money, usd } from "@/shared/api";
 import { StatusChip } from "@/shared/ui/StatusChip";
 import { TradeTimer } from "@/shared/ui/TradeTimer";
+import { CoinIcon, CoinPairIcons } from "@/shared/ui/CoinIcon";
 
 const sessionKey = "thiago.session";
 const keepAliveIntervalMs = 14 * 60 * 1000;
@@ -45,15 +46,6 @@ type BinanceTicker = {
   priceChangePercent: string;
   highPrice: string;
   lowPrice: string;
-};
-
-const coinLogos: Record<string, string> = {
-  BTC: "https://assets.coingecko.com/coins/images/1/large/bitcoin.png",
-  ETH: "https://assets.coingecko.com/coins/images/279/large/ethereum.png",
-  BNB: "https://assets.coingecko.com/coins/images/825/large/bnb-icon2_2x.png",
-  SOL: "https://assets.coingecko.com/coins/images/4128/large/solana.png",
-  XRP: "https://assets.coingecko.com/coins/images/44/large/xrp-symbol-white-128.png",
-  USDT: "https://assets.coingecko.com/coins/images/325/large/Tether.png"
 };
 
 export default function Home() {
@@ -245,11 +237,11 @@ function ExchangeApp() {
             <Grid item xs={12} md={5}>
               <Card
                 sx={{
-                  color: "#08133b",
-                  border: "1px solid rgba(8,19,59,0.10)",
+                  color: "#08204a",
+                  border: "1px solid rgba(37,99,235,0.16)",
                   borderRadius: { xs: 3, md: 4 },
-                  boxShadow: "0 18px 48px rgba(8,19,59,0.10)",
-                  background: "#fff",
+                  boxShadow: "0 22px 58px rgba(37,99,235,0.14)",
+                  background: "#f8fbff",
                   position: "relative",
                   overflow: "hidden",
                   "&::before": activeTrade
@@ -258,7 +250,7 @@ function ExchangeApp() {
                         position: "absolute",
                         inset: "0 auto 0 0",
                         width: 6,
-                        bgcolor: activeTrade.status === "confirmed" ? "#0f7a62" : "#d49416"
+                        bgcolor: activeTrade.status === "confirmed" ? "#0ea5e9" : "#2563eb"
                       }
                     : undefined
                 }}
@@ -274,26 +266,29 @@ function ExchangeApp() {
                           letterSpacing: 1.5,
                           fontWeight: 1000,
                           fontSize: { xs: 11, md: 12 },
-                          color: activeTrade ? "#08133b" : "#53627c",
-                          bgcolor: activeTrade ? "#f6f7fb" : "#f8fafc",
-                          border: "1px solid rgba(8,19,59,0.08)"
+                          color: activeTrade ? "#0f3e99" : "#53627c",
+                          bgcolor: activeTrade ? "#eff6ff" : "#f8fafc",
+                          border: "1px solid rgba(37,99,235,0.14)"
                         }}
                       />
-                      <Box sx={{ width: 38, height: 38, display: "grid", placeItems: "center", borderRadius: "50%", bgcolor: activeTrade ? "#08133b" : "#f0efff", boxShadow: activeTrade ? "0 8px 18px rgba(8,19,59,0.16)" : "none" }}>
-                        <TimerIcon sx={{ color: activeTrade ? "#fff" : "#5757f6", fontSize: 21 }} />
+                      <Box sx={{ width: 38, height: 38, display: "grid", placeItems: "center", borderRadius: "50%", bgcolor: activeTrade ? "#1d4ed8" : "#eff6ff", boxShadow: activeTrade ? "0 8px 18px rgba(37,99,235,0.24)" : "none" }}>
+                        <TimerIcon sx={{ color: activeTrade ? "#fff" : "#2563eb", fontSize: 21 }} />
                       </Box>
                     </Stack>
                     {activeTrade ? (
                       <>
                         <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={2}>
-                          <Box>
+                          <Stack direction="row" spacing={1.1} alignItems="center">
+                            <CoinIcon coin={activeTrade.coin} size={42} />
+                            <Box>
                             <Typography variant="h4" sx={{ fontWeight: 1000, letterSpacing: "-0.035em", fontSize: { xs: 22, md: 30 }, lineHeight: 1.05 }}>
-                              {activeTrade.coin} {usd(activeTrade.amountUsd)}
+                              {usd(activeTrade.amountUsd)}
                             </Typography>
                             <Typography sx={{ mt: 0.35, color: "#64708a", fontSize: { xs: 14, md: 16 } }}>
                               Expected payout {money(activeTrade.expectedNgn)}
                             </Typography>
-                          </Box>
+                            </Box>
+                          </Stack>
                           <StatusChip status={activeTrade.status} />
                         </Stack>
                         <TradeTimer trade={activeTrade} onExpired={() => loadTrades()} />
@@ -305,14 +300,14 @@ function ExchangeApp() {
                             ["Chat", `${activeTrade.messages?.length || 0} messages`]
                           ].map(([label, value]) => (
                             <Grid item xs={6} key={label}>
-                              <Box sx={{ p: { xs: 1.05, md: 1.25 }, minHeight: { xs: 66, md: 76 }, borderRadius: 2, bgcolor: "#f8fafc", border: "1px solid rgba(8,19,59,0.08)" }}>
+                              <Box sx={{ p: { xs: 1.05, md: 1.25 }, minHeight: { xs: 66, md: 76 }, borderRadius: 2, bgcolor: "#fff", border: "1px solid rgba(37,99,235,0.12)" }}>
                                 <Typography variant="caption" sx={{ color: "#64708a", fontWeight: 800, fontSize: { xs: 11, md: 12 } }}>{label}</Typography>
                                 <Typography sx={{ fontWeight: 1000, wordBreak: "break-word", fontSize: { xs: 14, md: 16 }, lineHeight: 1.25 }}>{value}</Typography>
                               </Box>
                             </Grid>
                           ))}
                         </Grid>
-                        <Button variant="contained" href={`/trades/${activeTrade.id}`} sx={{ minHeight: { xs: 42, md: 46 }, bgcolor: "#08133b", color: "#fff", borderRadius: 999, "&:hover": { bgcolor: "#050b24" } }}>
+                        <Button variant="contained" href={`/trades/${activeTrade.id}`} sx={{ minHeight: { xs: 42, md: 46 }, bgcolor: "#1d4ed8", color: "#fff", borderRadius: 999, "&:hover": { bgcolor: "#1e40af" } }}>
                           Continue Chat
                         </Button>
                       </>
@@ -477,7 +472,6 @@ function MarketSlider({ rates }: { rates: Rate[] }) {
   const liveItems = tickers.map((ticker) => ({
     key: ticker.symbol,
     coin: ticker.symbol.replace("USDT", ""),
-    pair: ticker.symbol.replace("USDT", "/USDT"),
     price: `$${Number(ticker.lastPrice).toLocaleString("en-US", { maximumFractionDigits: Number(ticker.lastPrice) > 100 ? 2 : 4 })}`,
     change: `${Number(ticker.priceChangePercent) >= 0 ? "+" : ""}${Number(ticker.priceChangePercent).toFixed(2)}%`,
     positive: Number(ticker.priceChangePercent) >= 0,
@@ -488,7 +482,6 @@ function MarketSlider({ rates }: { rates: Rate[] }) {
     : fallbackRates.map((rate) => ({
         key: rate.id,
         coin: rate.coin,
-        pair: `${rate.coin}/NGN`,
         price: `${money(rate.buyRateNgn)} / $1`,
         change: "Desk",
         positive: true,
@@ -523,14 +516,9 @@ function MarketSlider({ rates }: { rates: Rate[] }) {
             }}
           >
             <Stack direction="row" spacing={0.8} alignItems="center">
-              <Box
-                component="img"
-                src={coinLogos[item.coin] || coinLogos.USDT}
-                alt={`${item.coin} logo`}
-                sx={{ width: { xs: 26, md: 30 }, height: { xs: 26, md: 30 }, borderRadius: "50%", bgcolor: "#fff", objectFit: "contain", boxShadow: "0 4px 10px rgba(8,19,59,0.08)" }}
-              />
+              <CoinPairIcons base={item.coin} size={30} />
               <Box sx={{ minWidth: 0 }}>
-                <Typography sx={{ fontWeight: 1000, fontSize: { xs: 12.5, md: 13.5 }, lineHeight: 1.15, whiteSpace: "nowrap" }}>{item.pair}</Typography>
+                <Typography sx={{ fontWeight: 1000, fontSize: { xs: 12.5, md: 13.5 }, lineHeight: 1.15, whiteSpace: "nowrap" }}>Live pair</Typography>
                 <Stack direction="row" spacing={0.6} alignItems="baseline">
                   <Typography sx={{ fontWeight: 1000, color: "#5757f6", fontSize: { xs: 13, md: 15 }, lineHeight: 1.2, whiteSpace: "nowrap" }}>{item.price}</Typography>
                   <Typography sx={{ fontWeight: 900, fontSize: { xs: 10.5, md: 11.5 }, color: item.positive ? "#0f7a40" : "#b42318", whiteSpace: "nowrap" }}>{item.change}</Typography>

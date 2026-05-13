@@ -19,6 +19,7 @@ import PersonIcon from "@mui/icons-material/Person";
 import WhatsAppIcon from "@mui/icons-material/WhatsApp";
 import type { Rate, User } from "@/shared/api";
 import { api, money, usd } from "@/shared/api";
+import { coinIconUrls } from "@/shared/ui/CoinIcon";
 
 const enabledKey = "thiago.rateNotifications.enabled";
 const notificationIntervalMs = 5 * 60 * 1000;
@@ -172,9 +173,9 @@ function notifyRate(rates: Rate[]) {
   if (!rates.length || !("Notification" in window) || Notification.permission !== "granted") return;
   const featured = rates.filter((rate) => ["BTC", "ETH", "USDT"].includes(rate.coin.toUpperCase()));
   const rate = (featured.length ? featured : rates)[Math.floor(Math.random() * (featured.length ? featured.length : rates.length))];
-  new Notification(`${rate.coin} rate update`, {
+  new Notification("Desk rate update", {
     body: `${rate.network}: Thiago buys at ${money(rate.buyRateNgn)} per $1. Minimum ${usd(rate.minAmountUsd)}.`,
-    icon: "/thiago-logo.svg",
+    icon: coinIconUrls[rate.coin.toUpperCase()] || "/thiago-logo.svg",
     tag: `thiago-rate-${rate.coin}`
   });
 }

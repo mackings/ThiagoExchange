@@ -1,6 +1,5 @@
 "use client";
 
-import Avatar from "@mui/material/Avatar";
 import Box from "@mui/material/Box";
 import Card from "@mui/material/Card";
 import CardContent from "@mui/material/CardContent";
@@ -13,6 +12,7 @@ import BoltIcon from "@mui/icons-material/Bolt";
 import TrendingUpIcon from "@mui/icons-material/TrendingUp";
 import type { Rate, Trade } from "@/shared/api";
 import { money, usd } from "@/shared/api";
+import { CoinIcon } from "@/shared/ui/CoinIcon";
 
 export function RatesView({ rates, trades = [] }: { rates: Rate[]; trades?: Trade[] }) {
   function successfulCount(rate: Rate) {
@@ -43,12 +43,10 @@ export function RatesView({ rates, trades = [] }: { rates: Rate[]; trades?: Trad
               <Stack spacing={2.2}>
                 <Stack direction="row" alignItems="flex-start" justifyContent="space-between" spacing={1.5}>
                   <Stack direction="row" alignItems="center" spacing={1.5}>
-                  <Avatar sx={{ bgcolor: "#08133b", color: "#8fffb5", fontWeight: 1000, width: 58, height: 58, fontSize: 26 }}>
-                    {rate.coin.slice(0, 1)}
-                  </Avatar>
+                  <CoinIcon coin={rate.coin} size={58} />
                   <div>
                     <Typography variant="h5" sx={{ fontWeight: 1000, letterSpacing: "-0.04em" }}>
-                      {rate.coin}
+                      Live offer
                     </Typography>
                     <Typography variant="body2" color="text.secondary">
                       {rate.network}

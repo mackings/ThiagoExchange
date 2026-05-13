@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useState } from "react";
-import Avatar from "@mui/material/Avatar";
 import Alert from "@mui/material/Alert";
 import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
@@ -26,6 +25,7 @@ import ReceiptLongIcon from "@mui/icons-material/ReceiptLong";
 import ShieldIcon from "@mui/icons-material/Shield";
 import type { Rate, Trade } from "@/shared/api";
 import { api, money, usd } from "@/shared/api";
+import { CoinIcon } from "@/shared/ui/CoinIcon";
 
 export function TradeView({
   rates,
@@ -142,7 +142,10 @@ export function TradeView({
                 <Chip size="small" icon={<ShieldIcon />} label="TRADING GROUND" sx={{ alignSelf: "flex-start", bgcolor: "#f0efff", color: "#3035bf", fontWeight: 1000, letterSpacing: 1.6 }} />
                 <Box>
                   <Typography sx={{ fontWeight: 1000, fontSize: { xs: 28, md: 42 }, letterSpacing: "-0.04em", lineHeight: 1 }}>
-                    Sell {selected.coin}
+                    <Stack component="span" direction="row" spacing={1} alignItems="center">
+                      <span>Sell</span>
+                      <CoinIcon coin={selected.coin} size={36} />
+                    </Stack>
                   </Typography>
                   <Typography color="text.secondary">{selected.network} offer from Thiago Desk</Typography>
                 </Box>
@@ -253,12 +256,10 @@ export function TradeView({
                 <Stack spacing={{ xs: 1.6, md: 2.2 }}>
                   <Stack direction="row" justifyContent="space-between" alignItems="flex-start">
                     <Stack direction="row" spacing={1.4} alignItems="center">
-                      <Avatar sx={{ bgcolor: "#f0efff", color: "#5757f6", fontWeight: 1000, width: { xs: 38, md: 48 }, height: { xs: 38, md: 48 } }}>
-                        {rate.coin.slice(0, 1)}
-                      </Avatar>
+                      <CoinIcon coin={rate.coin} size={48} />
                       <Box>
                         <Typography variant="h6" sx={{ fontWeight: 1000, fontSize: { xs: 16, md: 20 } }}>
-                          Sell {rate.coin}
+                          Sell
                         </Typography>
                         <Typography variant="body2" color="text.secondary">
                           {rate.network}

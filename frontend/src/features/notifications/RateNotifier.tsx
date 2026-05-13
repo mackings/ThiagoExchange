@@ -8,6 +8,7 @@ import NotificationsActiveIcon from "@mui/icons-material/NotificationsActive";
 import NotificationsNoneIcon from "@mui/icons-material/NotificationsNone";
 import type { Rate } from "@/shared/api";
 import { money, usd } from "@/shared/api";
+import { coinIconUrls } from "@/shared/ui/CoinIcon";
 
 const enabledKey = "thiago.rateNotifications.enabled";
 const notificationIntervalMs = 5 * 60 * 1000;
@@ -95,9 +96,9 @@ function notifyNextRate(rates: Rate[], indexRef: React.MutableRefObject<number>)
   const rate = rates[indexRef.current % rates.length];
   indexRef.current += 1;
 
-  new Notification(`${rate.coin} rate update`, {
+  new Notification("Desk rate update", {
     body: `${rate.network}: Thiago buys at ${money(rate.buyRateNgn)} per $1. Minimum ${usd(rate.minAmountUsd)}.`,
-    icon: "/thiago-logo.svg",
+    icon: coinIconUrls[rate.coin.toUpperCase()] || "/thiago-logo.svg",
     tag: `thiago-rate-${rate.coin}`
   });
 }

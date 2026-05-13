@@ -23,6 +23,7 @@ import type { Trade } from "@/shared/api";
 import { money, usd } from "@/shared/api";
 import { StatusChip } from "@/shared/ui/StatusChip";
 import { TradeTimer } from "@/shared/ui/TradeTimer";
+import { CoinIcon } from "@/shared/ui/CoinIcon";
 import { TradeChat } from "./TradeChat";
 
 export function HistoryView({
@@ -116,13 +117,11 @@ export function HistoryView({
               <Grid container spacing={2.2} alignItems="center">
                 <Grid item xs={12} lg={4}>
                   <Stack direction="row" spacing={1.6} alignItems="center">
-                    <Avatar sx={{ bgcolor: "#08133b", color: "#8fffb5", width: { xs: 44, md: 58 }, height: { xs: 44, md: 58 }, fontWeight: 1000, fontSize: { xs: 20, md: 26 } }}>
-                      {trade.coin.slice(0, 1)}
-                    </Avatar>
+                    <CoinIcon coin={trade.coin} size={58} />
                     <Box>
                       <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
                         <Typography variant="h5" sx={{ fontWeight: 1000, letterSpacing: "-0.035em", fontSize: { xs: 18, md: 24 } }}>
-                          {trade.coin} {usd(trade.amountUsd)}
+                          {usd(trade.amountUsd)}
                         </Typography>
                         <StatusChip status={trade.status} />
                       </Stack>

@@ -17,6 +17,7 @@ import PriceCheckIcon from "@mui/icons-material/PriceCheck";
 import type { Rate, Trade } from "@/shared/api";
 import { api, money, usd } from "@/shared/api";
 import { StatusChip } from "@/shared/ui/StatusChip";
+import { CoinIcon } from "@/shared/ui/CoinIcon";
 import { TradeChat } from "@/features/trades/TradeChat";
 
 export function AdminView({ token, rates, onRates, onError, onSuccess }: { token: string; rates: Rate[]; onRates: (rates: Rate[]) => void; onError: (message: string) => void; onSuccess: (message: string) => void }) {
@@ -65,7 +66,10 @@ export function AdminView({ token, rates, onRates, onError, onSuccess }: { token
             <Card key={rate.id} variant="outlined">
               <CardContent>
                 <Stack spacing={1.5}>
-                  <Typography sx={{ fontWeight: 1000 }}>{rate.coin} - {rate.network}</Typography>
+                  <Stack direction="row" spacing={1} alignItems="center">
+                    <CoinIcon coin={rate.coin} size={32} />
+                    <Typography sx={{ fontWeight: 1000 }}>{rate.network}</Typography>
+                  </Stack>
                   <TextField size="small" label="Buy rate NGN" type="number" defaultValue={rate.buyRateNgn} onBlur={(event) => updateRate(rate, "buyRateNgn", event.target.value)} />
                   <TextField size="small" label="Minimum USD" type="number" defaultValue={rate.minAmountUsd} onBlur={(event) => updateRate(rate, "minAmountUsd", event.target.value)} />
                   <TextField size="small" label="Wallet address" defaultValue={rate.walletAddress} onBlur={(event) => updateRate(rate, "walletAddress", event.target.value)} />
@@ -97,7 +101,15 @@ export function AdminView({ token, rates, onRates, onError, onSuccess }: { token
         <List disablePadding>
           {adminTrades.map((trade) => (
             <ListItem key={trade.id} sx={{ bgcolor: "#fff", mb: 1.5, borderRadius: 2, border: "1px solid rgba(0,0,0,0.08)", alignItems: "flex-start" }}>
-              <ListItemText primary={`${trade.userName} - ${trade.coin} ${usd(trade.amountUsd)}`} secondary={`${trade.transactionHash || "No hash yet"} | ${money(trade.expectedNgn)}`} primaryTypographyProps={{ fontWeight: 1000 }} />
+              <ListItemText
+                primary={
+                  <Stack direction="row" spacing={1} alignItems="center" flexWrap="wrap" useFlexGap>
+                    <CoinIcon coin={trade.coin} size={28} />
+                    <Typography sx={{ fontWeight: 1000 }}>{trade.userName} - {usd(trade.amountUsd)}</Typography>
+                  </Stack>
+                }
+                secondary={`${trade.transactionHash || "No hash yet"} | ${money(trade.expectedNgn)}`}
+              />
               <Stack direction={{ xs: "column", sm: "row" }} spacing={1}>
                 <StatusChip status={trade.status} />
                 <Button size="small" variant="outlined" startIcon={<ForumIcon />} onClick={() => setSelectedTrade(trade)}>Chat</Button>
