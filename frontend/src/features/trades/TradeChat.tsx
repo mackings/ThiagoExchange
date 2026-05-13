@@ -7,6 +7,10 @@ import Box from "@mui/material/Box";
 import Button from "@mui/material/Button";
 import Chip from "@mui/material/Chip";
 import Divider from "@mui/material/Divider";
+import Dialog from "@mui/material/Dialog";
+import DialogActions from "@mui/material/DialogActions";
+import DialogContent from "@mui/material/DialogContent";
+import DialogTitle from "@mui/material/DialogTitle";
 import IconButton from "@mui/material/IconButton";
 import InputAdornment from "@mui/material/InputAdornment";
 import Stack from "@mui/material/Stack";
@@ -45,6 +49,8 @@ export function TradeChat({
   const [attachmentUrl, setAttachmentUrl] = useState("");
   const [attachmentName, setAttachmentName] = useState("");
   const [connected, setConnected] = useState(false);
+  const [cancelOpen, setCancelOpen] = useState(false);
+  const [canceling, setCanceling] = useState(false);
   const socketRef = useRef<WebSocket | null>(null);
   const onTradeRef = useRef(onTrade);
   const onErrorRef = useRef(onError);
@@ -144,11 +150,15 @@ export function TradeChat({
 
   async function cancelTrade() {
     if (!token) return;
+    setCanceling(true);
     try {
       const updated = await api<Trade>(`/trades/${trade.id}/cancel`, { method: "PATCH" }, token);
       onTrade(updated);
+      setCancelOpen(false);
     } catch (err) {
       onError((err as Error).message);
+    } finally {
+      setCanceling(false);
     }
   }
 
@@ -279,14 +289,9 @@ export function TradeChat({
                         }
                   }}
                 >
-                  <Stack direction="row" justifyContent="space-between" spacing={1} alignItems="center">
-                    <Typography variant="caption" sx={{ fontWeight: 1000, color: isUser ? "#0f7a40" : isAdmin ? "#3035bf" : "#64708a", fontSize: { xs: 11.5, md: 12.5 }, lineHeight: 1.2 }}>
-                      {isSystem ? "Thiago Bot" : isAdmin ? "Thiago Desk" : "You"}
-                    </Typography>
-                    <Typography variant="caption" sx={{ fontWeight: 800, color: "#64708a", whiteSpace: "nowrap", fontSize: { xs: 11, md: 12 } }}>
-                      {formatMessageTime(item.createdAt)}
-                    </Typography>
-                  </Stack>
+                  <Typography variant="caption" sx={{ display: "block", fontWeight: 1000, color: isUser ? "#0f7a40" : isAdmin ? "#3035bf" : "#64708a", fontSize: { xs: 11.5, md: 12.5 }, lineHeight: 1.2 }}>
+                    {isSystem ? "Thiago Bot" : isAdmin ? "Thiago Desk" : "You"}
+                  </Typography>
                   <Typography sx={{ mt: 0.35, whiteSpace: "pre-wrap", fontSize: { xs: 13.5, md: 15 }, lineHeight: 1.45 }}>{item.body}</Typography>
                   {item.attachmentUrl && (
                     <Box
@@ -296,6 +301,9 @@ export function TradeChat({
                       sx={{ mt: 1, display: "block", maxWidth: "100%", borderRadius: 2, border: "1px solid rgba(8,19,59,0.10)" }}
                     />
                   )}
+                  <Typography variant="caption" sx={{ display: "block", mt: 0.35, textAlign: "right", fontWeight: 800, color: "#64708a", fontSize: { xs: 10.5, md: 11.5 }, lineHeight: 1.2 }}>
+                    {formatMessageTime(item.createdAt)}
+                  </Typography>
                 </Box>
               </Stack>
             );
@@ -353,7 +361,7 @@ export function TradeChat({
                 Send
               </Button>
               {trade.status === "pending" && (
-                <Button color="error" variant="text" startIcon={<CancelIcon />} onClick={cancelTrade}>
+                <Button color="error" variant="text" startIcon={<CancelIcon />} onClick={() => setCancelOpen(true)}>
                   Cancel
                 </Button>
               )}
@@ -363,6 +371,35 @@ export function TradeChat({
           <Alert severity={trade.status === "paid" ? "success" : "warning"}>{trade.receiptNote || `This trade is ${trade.status}.`}</Alert>
         )}
       </Stack>
+      <Dialog
+        open={cancelOpen}
+        onClose={() => !canceling && setCancelOpen(false)}
+        fullWidth
+        maxWidth="xs"
+        PaperProps={{
+          sx: {
+            m: { xs: 1.5, sm: 3 },
+            borderRadius: { xs: "24px 24px 12px 12px", sm: 3 },
+            alignSelf: { xs: "flex-end", sm: "center" },
+            width: { xs: "calc(100% - 24px)", sm: "100%" }
+          }
+        }}
+      >
+        <DialogTitle sx={{ pb: 0.5, fontWeight: 1000, color: "#08133b" }}>Cancel this trade?</DialogTitle>
+        <DialogContent sx={{ pt: 1 }}>
+          <Typography sx={{ color: "#64708a", fontSize: 14.5, lineHeight: 1.55 }}>
+            This will close the trading ground for {trade.coin} {usd(trade.amountUsd)}. Only continue if you no longer want to complete this trade.
+          </Typography>
+        </DialogContent>
+        <DialogActions sx={{ px: 3, pb: 2.5, pt: 0 }}>
+          <Button variant="text" onClick={() => setCancelOpen(false)} disabled={canceling}>
+            Keep Trade
+          </Button>
+          <Button color="error" variant="contained" onClick={cancelTrade} disabled={canceling}>
+            {canceling ? "Cancelling..." : "Yes, Cancel"}
+          </Button>
+        </DialogActions>
+      </Dialog>
     </Stack>
   );
 }
