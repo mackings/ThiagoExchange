@@ -23,7 +23,6 @@ import {
   Typography
 } from "@mui/material";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import HistoryIcon from "@mui/icons-material/History";
 import LoginIcon from "@mui/icons-material/Login";
 import LogoutIcon from "@mui/icons-material/Logout";
@@ -31,9 +30,7 @@ import SecurityIcon from "@mui/icons-material/Security";
 import TimerIcon from "@mui/icons-material/Timer";
 import WalletIcon from "@mui/icons-material/Wallet";
 import { AuthDialog, AuthMode, Session } from "@/features/auth/AuthDialog";
-import { ProfileView } from "@/features/profile/ProfileView";
 import { HistoryView } from "@/features/trades/HistoryView";
-import { TradeChat } from "@/features/trades/TradeChat";
 import { TradeView } from "@/features/trades/TradeView";
 import { API_HEALTH_URL, Rate, Trade, api, money, usd } from "@/shared/api";
 import { StatusChip } from "@/shared/ui/StatusChip";
@@ -41,8 +38,6 @@ import { TradeTimer } from "@/shared/ui/TradeTimer";
 
 const sessionKey = "thiago.session";
 const keepAliveIntervalMs = 14 * 60 * 1000;
-type TradeScreen = "offers" | "trade";
-type PageView = "home" | "profile" | "activeTrades";
 type BinanceTicker = {
   symbol: string;
   lastPrice: string;
@@ -73,21 +68,14 @@ function ExchangeApp() {
   const [authMode, setAuthMode] = useState<AuthMode>("login");
   const [error, setError] = useState("");
   const [success, setSuccess] = useState("");
-  const [selectedRate, setSelectedRate] = useState<Rate | null>(null);
-  const [tradeScreen, setTradeScreen] = useState<TradeScreen>("offers");
-  const [pageView, setPageView] = useState<PageView>("home");
   const [activeTradeSeen, setActiveTradeSeen] = useState("");
-  const [selectedTradeId, setSelectedTradeId] = useState("");
 
   const token = session?.token;
   const user = session?.user;
   const safeRates = Array.isArray(rates) ? rates : [];
   const safeTrades = Array.isArray(trades) ? trades : [];
   const activeTrades = useMemo(() => safeTrades.filter((trade) => trade.status === "pending" || trade.status === "confirmed"), [safeTrades]);
-  const activeTrade = useMemo(
-    () => activeTrades.find((trade) => trade.id === selectedTradeId) || activeTrades[0] || null,
-    [activeTrades, selectedTradeId]
-  );
+  const activeTrade = activeTrades[0] || null;
 
   useEffect(() => {
     const saved = localStorage.getItem(sessionKey);
@@ -152,13 +140,6 @@ function ExchangeApp() {
     setAuthOpen(false);
   }
 
-  function updateUser(nextUser: Session["user"]) {
-    if (!session) return;
-    const next = { ...session, user: nextUser };
-    localStorage.setItem(sessionKey, JSON.stringify(next));
-    setSession(next);
-  }
-
   function logout() {
     localStorage.removeItem(sessionKey);
     setSession(null);
@@ -166,9 +147,6 @@ function ExchangeApp() {
     setAuthMode("login");
     setAuthOpen(true);
     setActiveTab(0);
-    setTradeScreen("offers");
-    setPageView("home");
-    setSelectedRate(null);
   }
 
   return (
@@ -196,8 +174,6 @@ function ExchangeApp() {
                 key={item}
                 onClick={() => {
                   setActiveTab(index);
-                  if (index === 0) setTradeScreen("offers");
-                  setSelectedRate(null);
                 }}
                 sx={{
                   px: 2.3,
@@ -214,7 +190,7 @@ function ExchangeApp() {
           {user ? (
             <Stack direction="row" spacing={1} alignItems="center">
               <Tooltip title="Profile">
-                <IconButton onClick={() => setPageView("profile")} aria-label="open profile" sx={{ p: 0 }}>
+                <IconButton href="/profile" aria-label="open profile" sx={{ p: 0 }}>
                   <Avatar sx={{ width: 34, height: 34, bgcolor: "primary.main", fontWeight: 900 }}>{user.name.charAt(0).toUpperCase()}</Avatar>
                 </IconButton>
               </Tooltip>
@@ -302,7 +278,7 @@ function ExchangeApp() {
                             </Grid>
                           ))}
                         </Grid>
-                        <Button variant="contained" onClick={() => { setActiveTab(0); setTradeScreen("trade"); }} sx={{ bgcolor: "#5757f6" }}>
+                        <Button variant="contained" href={`/trades/${activeTrade.id}`} sx={{ bgcolor: "#5757f6" }}>
                           Continue Chat
                         </Button>
                       </>
@@ -310,7 +286,7 @@ function ExchangeApp() {
                       <>
                         <Typography variant="h4" sx={{ fontWeight: 1000, letterSpacing: "-0.04em", fontSize: { xs: 26, md: 34 } }}>No open trade</Typography>
                         <Typography color="text.secondary">Choose an offer to start a 30-minute secured chat.</Typography>
-                        <Button variant="outlined" onClick={() => { setActiveTab(0); setTradeScreen("offers"); }} sx={{ alignSelf: "flex-start" }}>
+                        <Button variant="outlined" onClick={() => setActiveTab(0)} sx={{ alignSelf: "flex-start" }}>
                           Choose Offer
                         </Button>
                       </>
@@ -325,111 +301,70 @@ function ExchangeApp() {
 
       <Container maxWidth="xl" sx={{ mt: { xs: 0, md: -2 }, pb: { xs: 3, md: 6 } }}>
         <Paper sx={{ borderRadius: { xs: 4, md: 6 }, overflow: "hidden", bgcolor: "#fff", border: "1px solid rgba(87,87,246,0.14)", boxShadow: "0 16px 46px rgba(8,19,59,0.08)" }}>
-          {pageView === "home" && tradeScreen !== "trade" && (
-            <Box sx={{ px: { xs: 0.8, md: 2 }, pt: { xs: 0.8, md: 1.5 }, borderBottom: "1px solid rgba(87,87,246,0.12)" }}>
-              <Tabs
-                value={activeTab}
-                onChange={(_, value) => {
-                  setActiveTab(value);
-                  if (value === 0) setTradeScreen("offers");
-                  setSelectedRate(null);
-                }}
-                variant="fullWidth"
-                allowScrollButtonsMobile
-                sx={{
-                  minHeight: { xs: 52, md: 68 },
-                  "& .MuiTabs-flexContainer": { gap: { xs: 1.2, md: 2 }, justifyContent: "space-between" },
-                  "& .MuiTabs-indicator": {
-                    display: "none"
-                  },
-                  "& .MuiTabs-indicatorSpan": {
-                    width: "70%",
-                    bgcolor: "#08133b"
-                  },
-                  "& .MuiTab-root": {
-                    minHeight: { xs: 46, md: 58 },
-                    px: { xs: 1.4, md: 3 },
-                    borderRadius: 999,
-                    fontWeight: 900,
-                    fontSize: { xs: 13, sm: 16 },
-                    color: "#66708a",
-                    border: "1px solid transparent",
-                    transition: "background-color .18s ease, color .18s ease, border-color .18s ease"
-                  },
-                  "& .Mui-selected": {
-                    color: "#08133b",
-                    bgcolor: "#f0efff",
-                    borderColor: "rgba(87,87,246,0.12)"
-                  }
-                }}
-              >
-                <Tab icon={<WalletIcon />} iconPosition="start" label="Offers" />
-                <Tab icon={<HistoryIcon />} iconPosition="start" label="History" />
-              </Tabs>
-            </Box>
-          )}
+          <Box sx={{ px: { xs: 0.8, md: 2 }, pt: { xs: 0.8, md: 1.5 }, borderBottom: "1px solid rgba(87,87,246,0.12)" }}>
+            <Tabs
+              value={activeTab}
+              onChange={(_, value) => {
+                setActiveTab(value);
+              }}
+              variant="fullWidth"
+              allowScrollButtonsMobile
+              sx={{
+                minHeight: { xs: 52, md: 68 },
+                "& .MuiTabs-flexContainer": { gap: { xs: 1.2, md: 2 }, justifyContent: "space-between" },
+                "& .MuiTabs-indicator": {
+                  display: "none"
+                },
+                "& .MuiTabs-indicatorSpan": {
+                  width: "70%",
+                  bgcolor: "#08133b"
+                },
+                "& .MuiTab-root": {
+                  minHeight: { xs: 46, md: 58 },
+                  px: { xs: 1.4, md: 3 },
+                  borderRadius: 999,
+                  fontWeight: 900,
+                  fontSize: { xs: 13, sm: 16 },
+                  color: "#66708a",
+                  border: "1px solid transparent",
+                  transition: "background-color .18s ease, color .18s ease, border-color .18s ease"
+                },
+                "& .Mui-selected": {
+                  color: "#08133b",
+                  bgcolor: "#f0efff",
+                  borderColor: "rgba(87,87,246,0.12)"
+                }
+              }}
+            >
+              <Tab icon={<WalletIcon />} iconPosition="start" label="Offers" />
+              <Tab icon={<HistoryIcon />} iconPosition="start" label="History" />
+            </Tabs>
+          </Box>
 
           <Box sx={{ p: { xs: 1.25, md: 3 } }}>
             {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError("")}>{error}</Alert>}
             {success && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess("")}>{success}</Alert>}
-            {pageView === "profile" && (
-              <PageShell title="Profile" onBack={() => setPageView("home")}>
-                <ProfileView
-                  user={user}
-                  token={token}
-                  rates={safeRates}
-                  onUser={updateUser}
-                  onLogout={logout}
-                  onError={setError}
-                  onSuccess={setSuccess}
-                />
-              </PageShell>
-            )}
-            {pageView === "activeTrades" && (
-              <PageShell title="Active trades" onBack={() => setPageView("home")}>
-                <ActiveTradesPage
-                  trades={activeTrades}
-                  onOpen={(trade) => {
-                    setSelectedTradeId(trade.id);
-                    setTradeScreen("trade");
-                    setPageView("home");
-                    setSelectedRate(null);
-                  }}
-                />
-              </PageShell>
-            )}
-            {pageView === "home" && tradeScreen === "trade" && activeTrade && token && (
-              <PageShell title="Trading ground" onBack={() => setTradeScreen("offers")}>
-                <TradeChat
-                  trade={activeTrade}
-                  token={token}
-                  onTrade={(updated) => setTrades((items) => (Array.isArray(items) ? items : []).map((item) => item.id === updated.id ? updated : item))}
-                  onRefresh={() => loadTrades()}
-                  onError={setError}
-                />
-              </PageShell>
-            )}
-            {pageView === "home" && tradeScreen !== "trade" && activeTab === 0 && (
+            {activeTab === 0 && (
               <TradeView
                 rates={safeRates}
                 trades={safeTrades}
                 token={token}
-                selectedRate={selectedRate}
-                onSelectedRate={setSelectedRate}
+                selectedRate={null}
+                onSelectedRate={() => undefined}
+                onViewOffer={(rate) => {
+                  window.location.href = `/offers/${rate.id}`;
+                }}
                 onRequireAuth={() => setAuthOpen(true)}
                 onCreated={(trade) => {
                   setTrades((items) => [trade, ...(Array.isArray(items) ? items : [])]);
                   setSuccess("Trade opened. Trading ground started.");
-                  setActiveTab(0);
-                  setTradeScreen("trade");
-                  setSelectedTradeId(trade.id);
-                  setSelectedRate(null);
+                  window.location.href = `/trades/${trade.id}`;
                   window.setTimeout(() => loadTrades(), 250);
                 }}
                 onError={setError}
               />
             )}
-            {pageView === "home" && tradeScreen !== "trade" && activeTab === 1 && <HistoryView trades={safeTrades} token={token} onRefresh={() => loadTrades()} onError={setError} />}
+            {activeTab === 1 && <HistoryView trades={safeTrades} token={token} onRefresh={() => loadTrades()} onError={setError} />}
           </Box>
         </Paper>
       </Container>
@@ -439,14 +374,10 @@ function ExchangeApp() {
           variant="contained"
           onClick={() => {
             if (activeTrades.length === 1) {
-              setSelectedTradeId(activeTrades[0].id);
-              setActiveTab(0);
-              setTradeScreen("trade");
-              setPageView("home");
-              setSelectedRate(null);
+              window.location.href = `/trades/${activeTrades[0].id}`;
               return;
             }
-            setPageView("activeTrades");
+            window.location.href = "/trades";
           }}
           sx={{
             position: "fixed",
@@ -591,57 +522,6 @@ function MarketSlider({ rates }: { rates: Rate[] }) {
         ))}
       </Stack>
     </Box>
-  );
-}
-
-function PageShell({ title, onBack, children }: { title: string; onBack: () => void; children: React.ReactNode }) {
-  return (
-    <Stack spacing={{ xs: 1.5, md: 2.5 }}>
-      <Stack direction="row" spacing={1} alignItems="center">
-        <IconButton onClick={onBack} aria-label={`back from ${title.toLowerCase()}`} sx={{ bgcolor: "#f8f8ff", border: "1px solid rgba(87,87,246,0.12)" }}>
-          <ArrowBackIcon />
-        </IconButton>
-        <Typography sx={{ fontWeight: 1000, fontSize: { xs: 22, md: 32 }, letterSpacing: "-0.035em" }}>{title}</Typography>
-      </Stack>
-      {children}
-    </Stack>
-  );
-}
-
-function ActiveTradesPage({ trades, onOpen }: { trades: Trade[]; onOpen: (trade: Trade) => void }) {
-  if (!trades.length) {
-    return <Alert severity="info" sx={{ borderRadius: 4 }}>No active trades right now.</Alert>;
-  }
-
-  return (
-    <Grid container spacing={{ xs: 1.5, md: 2 }}>
-      {trades.map((trade) => (
-        <Grid item xs={12} md={6} key={trade.id}>
-          <Card variant="outlined" sx={{ borderRadius: { xs: 4, md: 5 }, borderColor: "rgba(87,87,246,0.14)" }}>
-            <CardContent sx={{ p: { xs: 1.5, md: 2.5 } }}>
-              <Stack spacing={1.4}>
-                <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={1.5}>
-                  <Box>
-                    <Typography sx={{ fontWeight: 1000, fontSize: { xs: 20, md: 26 }, letterSpacing: "-0.035em" }}>
-                      {trade.coin} {usd(trade.amountUsd)}
-                    </Typography>
-                    <Typography color="text.secondary">{trade.network}</Typography>
-                  </Box>
-                  <StatusChip status={trade.status} />
-                </Stack>
-                <Box sx={{ p: 1.4, borderRadius: 3, bgcolor: "#f8f8ff", border: "1px solid rgba(87,87,246,0.10)" }}>
-                  <Typography variant="caption" sx={{ color: "#66708a", fontWeight: 900 }}>EXPECTED PAYOUT</Typography>
-                  <Typography sx={{ fontWeight: 1000 }}>{money(trade.expectedNgn)}</Typography>
-                </Box>
-                <Button variant="contained" onClick={() => onOpen(trade)} sx={{ bgcolor: "#5757f6" }}>
-                  Open Trading Ground
-                </Button>
-              </Stack>
-            </CardContent>
-          </Card>
-        </Grid>
-      ))}
-    </Grid>
   );
 }
 

@@ -33,6 +33,8 @@ export function TradeView({
   token,
   selectedRate,
   onSelectedRate,
+  onViewOffer,
+  onBackToOffers,
   onRequireAuth,
   onCreated,
   onError
@@ -42,6 +44,8 @@ export function TradeView({
   token?: string;
   selectedRate: Rate | null;
   onSelectedRate: (rate: Rate | null) => void;
+  onViewOffer?: (rate: Rate) => void;
+  onBackToOffers?: () => void;
   onRequireAuth: () => void;
   onCreated: (trade: Trade) => void;
   onError: (message: string) => void;
@@ -66,6 +70,10 @@ export function TradeView({
   }
 
   function viewOffer(rate: Rate) {
+    if (onViewOffer) {
+      onViewOffer(rate);
+      return;
+    }
     onSelectedRate(rate);
     setAmountUsd(String(rate.minAmountUsd));
     setAccepted(false);
@@ -116,7 +124,7 @@ export function TradeView({
   if (selected) {
     return (
       <Stack spacing={{ xs: 1.5, md: 2.5 }}>
-        <Button startIcon={<ArrowBackIcon />} onClick={() => onSelectedRate(null)} sx={{ alignSelf: "flex-start", color: "#08133b" }}>
+        <Button startIcon={<ArrowBackIcon />} onClick={() => (onBackToOffers ? onBackToOffers() : onSelectedRate(null))} sx={{ alignSelf: "flex-start", color: "#08133b" }}>
           Back to offers
         </Button>
         <Paper
