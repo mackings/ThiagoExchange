@@ -79,7 +79,9 @@ func (s *Service) Create(ctx context.Context, user auth.User, rateID string, amo
 	if err != nil {
 		return Trade{}, err
 	}
-	_ = s.mailer.Send(user.Email, "Trade opened on Thiago Exchange", fmt.Sprintf("Your %s trade for $%.2f is open for 30 minutes.\nSend to: %s", trade.Coin, trade.AmountUSD, trade.WalletAddress))
+	go func() {
+		_ = s.mailer.Send(user.Email, "Trade opened on Thiago Exchange", fmt.Sprintf("Your %s trade for $%.2f is open for 30 minutes.\nSend to: %s", trade.Coin, trade.AmountUSD, trade.WalletAddress))
+	}()
 	return trade, nil
 }
 
@@ -187,7 +189,9 @@ func (s *Service) SetStatus(ctx context.Context, tradeID, status, note string) (
 		return Trade{}, err
 	}
 	if status == StatusPaid {
-		_ = s.mailer.Send(trade.UserEmail, "Thiago Exchange payment receipt", fmt.Sprintf("Payment sent for trade %s.\nAmount: NGN %.2f\nNote: %s", trade.ID.Hex(), trade.ExpectedNGN, note))
+		go func() {
+			_ = s.mailer.Send(trade.UserEmail, "Thiago Exchange payment receipt", fmt.Sprintf("Payment sent for trade %s.\nAmount: NGN %.2f\nNote: %s", trade.ID.Hex(), trade.ExpectedNGN, note))
+		}()
 	}
 	trade.Status = status
 	trade.ReceiptNote = note

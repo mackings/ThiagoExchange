@@ -12,6 +12,9 @@ import {
   CardContent,
   Chip,
   Container,
+  Dialog,
+  DialogContent,
+  DialogTitle,
   Grid,
   IconButton,
   Paper,
@@ -22,7 +25,6 @@ import {
   Tooltip,
   Typography
 } from "@mui/material";
-import AccountCircleIcon from "@mui/icons-material/AccountCircle";
 import ArrowForwardIcon from "@mui/icons-material/ArrowForward";
 import HistoryIcon from "@mui/icons-material/History";
 import LoginIcon from "@mui/icons-material/Login";
@@ -30,6 +32,7 @@ import LogoutIcon from "@mui/icons-material/Logout";
 import SecurityIcon from "@mui/icons-material/Security";
 import TimerIcon from "@mui/icons-material/Timer";
 import WalletIcon from "@mui/icons-material/Wallet";
+import CloseIcon from "@mui/icons-material/Close";
 import { AuthDialog, AuthMode, Session } from "@/features/auth/AuthDialog";
 import { ProfileView } from "@/features/profile/ProfileView";
 import { HistoryView } from "@/features/trades/HistoryView";
@@ -42,6 +45,13 @@ import { TradeTimer } from "@/shared/ui/TradeTimer";
 const sessionKey = "thiago.session";
 const keepAliveIntervalMs = 14 * 60 * 1000;
 type TradeScreen = "offers" | "trade";
+type BinanceTicker = {
+  symbol: string;
+  lastPrice: string;
+  priceChangePercent: string;
+  highPrice: string;
+  lowPrice: string;
+};
 
 export default function Home() {
   return <ExchangeApp />;
@@ -59,12 +69,19 @@ function ExchangeApp() {
   const [selectedRate, setSelectedRate] = useState<Rate | null>(null);
   const [tradeScreen, setTradeScreen] = useState<TradeScreen>("offers");
   const [activeTradeSeen, setActiveTradeSeen] = useState("");
+  const [selectedTradeId, setSelectedTradeId] = useState("");
+  const [activeSheetOpen, setActiveSheetOpen] = useState(false);
+  const [profileOpen, setProfileOpen] = useState(false);
 
   const token = session?.token;
   const user = session?.user;
   const safeRates = Array.isArray(rates) ? rates : [];
   const safeTrades = Array.isArray(trades) ? trades : [];
-  const activeTrade = useMemo(() => safeTrades.find((trade) => trade.status === "pending" || trade.status === "confirmed") || null, [safeTrades]);
+  const activeTrades = useMemo(() => safeTrades.filter((trade) => trade.status === "pending" || trade.status === "confirmed"), [safeTrades]);
+  const activeTrade = useMemo(
+    () => activeTrades.find((trade) => trade.id === selectedTradeId) || activeTrades[0] || null,
+    [activeTrades, selectedTradeId]
+  );
 
   useEffect(() => {
     const saved = localStorage.getItem(sessionKey);
@@ -81,10 +98,11 @@ function ExchangeApp() {
   }, [token]);
 
   useEffect(() => {
-    if (!activeTrade || activeTrade.id === activeTradeSeen) return;
-    setActiveTradeSeen(activeTrade.id);
+    const newestActiveId = activeTrades[0]?.id || "";
+    if (!newestActiveId || newestActiveId === activeTradeSeen) return;
+    setActiveTradeSeen(newestActiveId);
     playActiveTradeSound();
-  }, [activeTrade, activeTradeSeen]);
+  }, [activeTrades, activeTradeSeen]);
 
   useEffect(() => {
     async function keepAlive() {
@@ -166,12 +184,13 @@ function ExchangeApp() {
           <Image src="/thiago-logo.svg" alt="Thiago Exchange" width={150} height={40} priority />
           <Box sx={{ flexGrow: 1 }} />
           <Stack direction="row" spacing={0.5} sx={{ display: { xs: "none", md: "flex" }, p: 0.5, borderRadius: 999, bgcolor: "#f3f4ff" }}>
-            {["Offers", "History", "Profile"].map((item, index) => (
+            {["Offers", "History"].map((item, index) => (
               <Button
                 key={item}
                 onClick={() => {
                   setActiveTab(index);
-                  if (index !== 0) setSelectedRate(null);
+                  if (index === 0) setTradeScreen("offers");
+                  setSelectedRate(null);
                 }}
                 sx={{
                   px: 2.3,
@@ -187,7 +206,11 @@ function ExchangeApp() {
           </Stack>
           {user ? (
             <Stack direction="row" spacing={1} alignItems="center">
-              <Avatar sx={{ width: 34, height: 34, bgcolor: "primary.main", fontWeight: 900 }}>{user.name.charAt(0).toUpperCase()}</Avatar>
+              <Tooltip title="Profile">
+                <IconButton onClick={() => setProfileOpen(true)} aria-label="open profile" sx={{ p: 0 }}>
+                  <Avatar sx={{ width: 34, height: 34, bgcolor: "primary.main", fontWeight: 900 }}>{user.name.charAt(0).toUpperCase()}</Avatar>
+                </IconButton>
+              </Tooltip>
               <Tooltip title="Sign out">
                 <IconButton onClick={logout} color="primary" aria-label="sign out"><LogoutIcon /></IconButton>
               </Tooltip>
@@ -300,7 +323,8 @@ function ExchangeApp() {
             value={activeTab}
             onChange={(_, value) => {
               setActiveTab(value);
-              if (value !== 0) setSelectedRate(null);
+              if (value === 0) setTradeScreen("offers");
+              setSelectedRate(null);
             }}
             variant="fullWidth"
             allowScrollButtonsMobile
@@ -337,22 +361,13 @@ function ExchangeApp() {
               label="Offers"
             />
             <Tab icon={<HistoryIcon />} iconPosition="start" label="History" />
-            <Tab icon={<AccountCircleIcon />} iconPosition="start" label="Profile" />
           </Tabs>
           </Box>
 
           <Box sx={{ p: { xs: 1.25, md: 3 } }}>
             {error && <Alert severity="error" sx={{ mb: 2 }} onClose={() => setError("")}>{error}</Alert>}
             {success && <Alert severity="success" sx={{ mb: 2 }} onClose={() => setSuccess("")}>{success}</Alert>}
-            {activeTab === 0 && tradeScreen === "trade" && activeTrade && token ? (
-              <TradeChat
-                trade={activeTrade}
-                token={token}
-                onTrade={(updated) => setTrades((items) => (Array.isArray(items) ? items : []).map((item) => item.id === updated.id ? updated : item))}
-                onRefresh={() => loadTrades()}
-                onError={setError}
-              />
-            ) : activeTab === 0 && (
+            {activeTab === 0 && (
               <TradeView
                 rates={safeRates}
                 trades={safeTrades}
@@ -365,6 +380,7 @@ function ExchangeApp() {
                   setSuccess("Trade opened. Trading ground started.");
                   setActiveTab(0);
                   setTradeScreen("trade");
+                  setSelectedTradeId(trade.id);
                   setSelectedRate(null);
                   window.setTimeout(() => loadTrades(), 250);
                 }}
@@ -372,17 +388,6 @@ function ExchangeApp() {
               />
             )}
             {activeTab === 1 && <HistoryView trades={safeTrades} token={token} onRefresh={() => loadTrades()} onError={setError} />}
-            {activeTab === 2 && (
-              <ProfileView
-                user={user}
-                token={token}
-                rates={safeRates}
-                onUser={updateUser}
-                onLogout={logout}
-                onError={setError}
-                onSuccess={setSuccess}
-              />
-            )}
           </Box>
         </Paper>
       </Container>
@@ -391,9 +396,14 @@ function ExchangeApp() {
         <Button
           variant="contained"
           onClick={() => {
-            setActiveTab(0);
-            setTradeScreen("trade");
-            setSelectedRate(null);
+            if (activeTrades.length === 1) {
+              setSelectedTradeId(activeTrades[0].id);
+              setActiveTab(0);
+              setTradeScreen("trade");
+              setSelectedRate(null);
+              return;
+            }
+            setActiveSheetOpen(true);
           }}
           sx={{
             position: "fixed",
@@ -417,9 +427,104 @@ function ExchangeApp() {
           }}
           endIcon={<ArrowForwardIcon />}
         >
-          Active trade
+          {activeTrades.length > 1 ? `${activeTrades.length} active trades` : "Active trade"}
         </Button>
       )}
+
+      <Dialog
+        open={activeSheetOpen}
+        onClose={() => setActiveSheetOpen(false)}
+        fullWidth
+        maxWidth="sm"
+        PaperProps={{
+          sx: {
+            position: "fixed",
+            bottom: 0,
+            m: 0,
+            borderRadius: "24px 24px 0 0",
+            width: "100%"
+          }
+        }}
+      >
+        <DialogTitle sx={{ pb: 1 }}>
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Typography sx={{ fontWeight: 1000, letterSpacing: "-0.03em" }}>Active trades</Typography>
+            <IconButton onClick={() => setActiveSheetOpen(false)} aria-label="close active trades"><CloseIcon /></IconButton>
+          </Stack>
+        </DialogTitle>
+        <DialogContent>
+          <Stack spacing={1.2} sx={{ pb: 2 }}>
+            {activeTrades.map((trade) => (
+              <Button
+                key={trade.id}
+                variant="outlined"
+                onClick={() => {
+                  setSelectedTradeId(trade.id);
+                  setActiveTab(0);
+                  setTradeScreen("trade");
+                  setSelectedRate(null);
+                  setActiveSheetOpen(false);
+                }}
+                sx={{ justifyContent: "space-between", borderRadius: 3, p: 1.4, borderColor: "rgba(87,87,246,0.18)" }}
+              >
+                <Stack alignItems="flex-start">
+                  <Typography sx={{ fontWeight: 1000 }}>{trade.coin} {usd(trade.amountUsd)}</Typography>
+                  <Typography sx={{ color: "#66708a", fontSize: 13 }}>{money(trade.expectedNgn)} expected</Typography>
+                </Stack>
+                <Chip size="small" label={trade.status} />
+              </Button>
+            ))}
+          </Stack>
+        </DialogContent>
+      </Dialog>
+
+      <Dialog
+        open={tradeScreen === "trade" && Boolean(activeTrade && token)}
+        onClose={() => setTradeScreen("offers")}
+        fullWidth
+        maxWidth="lg"
+        PaperProps={{ sx: { borderRadius: { xs: 0, sm: 5 }, m: { xs: 0, sm: 3 }, bgcolor: "transparent", boxShadow: "none" } }}
+      >
+        <DialogTitle sx={{ p: { xs: 1, sm: 1.5 } }}>
+          <Stack direction="row" justifyContent="space-between" alignItems="center">
+            <Typography sx={{ fontWeight: 1000, color: "#08133b" }}>Trading ground</Typography>
+            <IconButton onClick={() => setTradeScreen("offers")} aria-label="close trading ground"><CloseIcon /></IconButton>
+          </Stack>
+        </DialogTitle>
+        <DialogContent sx={{ p: { xs: 1, sm: 2 } }}>
+          {activeTrade && token && (
+            <TradeChat
+              trade={activeTrade}
+              token={token}
+              onTrade={(updated) => setTrades((items) => (Array.isArray(items) ? items : []).map((item) => item.id === updated.id ? updated : item))}
+              onRefresh={() => loadTrades()}
+              onError={setError}
+            />
+          )}
+        </DialogContent>
+      </Dialog>
+
+      <Dialog open={profileOpen} onClose={() => setProfileOpen(false)} fullWidth maxWidth="md" PaperProps={{ sx: { borderRadius: { xs: 0, sm: 5 }, m: { xs: 0, sm: 4 } } }}>
+        <DialogTitle sx={{ pb: 0 }}>
+          <Stack direction="row" justifyContent="flex-end">
+            <IconButton onClick={() => setProfileOpen(false)} aria-label="close profile"><CloseIcon /></IconButton>
+          </Stack>
+        </DialogTitle>
+        <DialogContent sx={{ pt: 1, pb: 3 }}>
+          <ProfileView
+            user={user}
+            token={token}
+            rates={safeRates}
+            onUser={updateUser}
+            onLogout={() => {
+              setProfileOpen(false);
+              logout();
+            }}
+            onError={setError}
+            onSuccess={setSuccess}
+          />
+        </DialogContent>
+      </Dialog>
 
       <AuthDialog open={authOpen} mode={authMode} onMode={setAuthMode} onClose={() => user && setAuthOpen(false)} onSession={saveSession} onError={setError} />
     </Box>
@@ -427,20 +532,57 @@ function ExchangeApp() {
 }
 
 function MarketSlider({ rates }: { rates: Rate[] }) {
-  const featured = rates.filter((rate) => ["BTC", "ETH", "USDT"].includes(rate.coin.toUpperCase()));
-  const items = (featured.length ? featured : rates).slice(0, 6);
-  const logos = ["Binance", "Coinbase", "Kraken", "OKX"];
+  const [tickers, setTickers] = useState<BinanceTicker[]>([]);
+  const [marketError, setMarketError] = useState("");
+  const symbols = ["BTCUSDT", "ETHUSDT", "BNBUSDT", "SOLUSDT", "XRPUSDT"];
+
+  useEffect(() => {
+    let mounted = true;
+    async function loadMarket() {
+      try {
+        const res = await fetch(`https://api.binance.com/api/v3/ticker/24hr?symbols=${encodeURIComponent(JSON.stringify(symbols))}`, { cache: "no-store" });
+        if (!res.ok) throw new Error("market unavailable");
+        const payload = (await res.json()) as BinanceTicker[];
+        if (mounted) {
+          setTickers(Array.isArray(payload) ? payload : []);
+          setMarketError("");
+        }
+      } catch {
+        if (mounted) setMarketError("Live market data is refreshing.");
+      }
+    }
+    loadMarket();
+    const id = window.setInterval(loadMarket, 60_000);
+    return () => {
+      mounted = false;
+      window.clearInterval(id);
+    };
+  }, []);
+
+  const fallbackRates = rates.filter((rate) => ["BTC", "ETH", "USDT"].includes(rate.coin.toUpperCase())).slice(0, 3);
+  const liveItems = tickers.map((ticker) => ({
+    key: ticker.symbol,
+    coin: ticker.symbol.replace("USDT", ""),
+    pair: ticker.symbol.replace("USDT", "/USDT"),
+    price: `$${Number(ticker.lastPrice).toLocaleString("en-US", { maximumFractionDigits: Number(ticker.lastPrice) > 100 ? 2 : 4 })}`,
+    change: `${Number(ticker.priceChangePercent) >= 0 ? "+" : ""}${Number(ticker.priceChangePercent).toFixed(2)}%`,
+    positive: Number(ticker.priceChangePercent) >= 0,
+    source: "Binance"
+  }));
+  const items = liveItems.length
+    ? liveItems
+    : fallbackRates.map((rate) => ({
+        key: rate.id,
+        coin: rate.coin,
+        pair: `${rate.coin}/NGN`,
+        price: `${money(rate.buyRateNgn)} / $1`,
+        change: "Desk",
+        positive: true,
+        source: "Thiago"
+      }));
 
   return (
-    <Box
-      sx={{
-        overflow: "hidden",
-        borderRadius: { xs: 4, md: 5 },
-        border: "1px solid rgba(87,87,246,0.14)",
-        bgcolor: "rgba(255,255,255,0.68)",
-        boxShadow: "0 12px 32px rgba(8,19,59,0.06)"
-      }}
-    >
+    <Box sx={{ overflow: "hidden", width: "100%" }}>
       <Stack
         direction="row"
         spacing={1.2}
@@ -454,11 +596,11 @@ function MarketSlider({ rates }: { rates: Rate[] }) {
           }
         }}
       >
-        {[...items, ...items].map((rate, index) => (
+        {[...items, ...items].map((item, index) => (
           <Box
-            key={`${rate.id}-${index}`}
+            key={`${item.key}-${index}`}
             sx={{
-              minWidth: { xs: 178, md: 220 },
+              minWidth: { xs: 190, md: 232 },
               p: 1.4,
               borderRadius: 3,
               bgcolor: "#fff",
@@ -466,17 +608,21 @@ function MarketSlider({ rates }: { rates: Rate[] }) {
             }}
           >
             <Stack direction="row" spacing={1} alignItems="center">
-              <Avatar sx={{ width: 34, height: 34, bgcolor: "#08133b", color: "#8fffb5", fontWeight: 1000 }}>
-                {rate.coin.slice(0, 1)}
+              <Avatar sx={{ width: 34, height: 34, bgcolor: item.source === "Binance" ? "#f3ba2f" : "#08133b", color: item.source === "Binance" ? "#111827" : "#8fffb5", fontWeight: 1000 }}>
+                {item.coin.slice(0, 1)}
               </Avatar>
               <Box>
-                <Typography sx={{ fontWeight: 1000, fontSize: 14 }}>{rate.coin} desk rate</Typography>
-                <Typography sx={{ fontWeight: 1000, color: "#5757f6" }}>{money(rate.buyRateNgn)} / $1</Typography>
+                <Typography sx={{ fontWeight: 1000, fontSize: 14 }}>{item.pair}</Typography>
+                <Stack direction="row" spacing={0.8} alignItems="center">
+                  <Typography sx={{ fontWeight: 1000, color: "#5757f6" }}>{item.price}</Typography>
+                  <Typography sx={{ fontWeight: 900, fontSize: 12, color: item.positive ? "#0f7a40" : "#b42318" }}>{item.change}</Typography>
+                </Stack>
+                <Typography sx={{ color: "#66708a", fontSize: 11 }}>{item.source} live rate</Typography>
               </Box>
             </Stack>
           </Box>
         ))}
-        {logos.map((name) => (
+        {["Binance", "Coinbase", "OKX"].map((name) => (
           <Box
             key={name}
             sx={{
@@ -489,7 +635,7 @@ function MarketSlider({ rates }: { rates: Rate[] }) {
             }}
           >
             <Typography sx={{ fontWeight: 1000, fontSize: 14 }}>{name}</Typography>
-            <Typography sx={{ color: "rgba(255,255,255,0.66)", fontSize: 12 }}>market signal</Typography>
+            <Typography sx={{ color: "rgba(255,255,255,0.66)", fontSize: 12 }}>{marketError || "exchange signal"}</Typography>
           </Box>
         ))}
       </Stack>
