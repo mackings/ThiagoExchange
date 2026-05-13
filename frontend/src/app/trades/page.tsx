@@ -64,13 +64,13 @@ export default function ActiveTradesPage() {
                 sx={{
                   height: "100%",
                   overflow: "hidden",
-                  borderRadius: { xs: 4, md: 5 },
-                  borderColor: "rgba(87,87,246,0.14)",
-                  background: "linear-gradient(145deg, #ffffff 0%, #f8f9ff 58%, #f1fff9 100%)",
+                  borderRadius: { xs: 3, md: 4 },
+                  borderColor: "rgba(8,19,59,0.10)",
+                  bgcolor: "#fff",
                   boxShadow: "0 16px 42px rgba(8,19,59,0.08)"
                 }}
               >
-                <Box sx={{ height: 5, background: trade.status === "pending" ? "linear-gradient(90deg, #5757f6, #19d27c)" : "linear-gradient(90deg, #0f7a62, #19d27c)" }} />
+                <Box sx={{ height: 5, bgcolor: trade.status === "pending" ? "#d49416" : "#0f7a62" }} />
                 <CardContent sx={{ p: { xs: 1.6, md: 2.5 } }}>
                   <Stack spacing={1.5}>
                     <Stack direction="row" justifyContent="space-between" alignItems="flex-start" spacing={1.5}>
@@ -90,7 +90,7 @@ export default function ActiveTradesPage() {
                         ["Chat", `${trade.messages?.length || 0} messages`]
                       ].map(([label, value]) => (
                         <Grid item xs={6} key={label}>
-                          <Box sx={{ p: 1.25, borderRadius: 3, bgcolor: "#fff", border: "1px solid rgba(87,87,246,0.10)" }}>
+                          <Box sx={{ p: 1.25, minHeight: 70, borderRadius: 2, bgcolor: "#f8fafc", border: "1px solid rgba(8,19,59,0.08)" }}>
                             <Typography variant="caption" sx={{ color: "#66708a", fontWeight: 900 }}>{label}</Typography>
                             <Typography sx={{ fontWeight: 1000, fontSize: { xs: 13.5, md: 15 }, wordBreak: "break-word" }}>{value}</Typography>
                           </Box>
@@ -98,7 +98,7 @@ export default function ActiveTradesPage() {
                       ))}
                     </Grid>
                     {trade.status === "pending" ? <TradeTimer trade={trade} onExpired={() => session?.token && loadTrades(session.token)} /> : <LinearProgress variant="determinate" value={100} sx={{ height: 8, borderRadius: 999 }} />}
-                    <Button variant="contained" href={`/trades/${trade.id}`} sx={{ bgcolor: "#5757f6", borderRadius: 999 }}>
+                    <Button variant="contained" href={`/trades/${trade.id}`} sx={{ bgcolor: "#08133b", borderRadius: 999, "&:hover": { bgcolor: "#050b24" } }}>
                       Open Trading Ground
                     </Button>
                   </Stack>
